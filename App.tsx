@@ -75,12 +75,12 @@ const App: React.FC = () => {
 
   // Check authentication
   useEffect(() => {
+    let unsubscribeFirestore: (() => void) | null = null;
+
     if (!isFirebaseConfigured) {
       setLoading(false);
       return;
     }
-
-    let unsubscribeFirestore: (() => void) | null = null;
 
     const unsubscribe = onAuthChange(async (currentUser) => {
       setUser(currentUser);
