@@ -139,3 +139,46 @@ CREATE POLICY "Users can update received messages"
   USING (auth.uid() = receiver_id)
   WITH CHECK (auth.uid() = receiver_id);
 
+-- Function to get partner progress (allows viewing partner's data if partnership exists)
+CREATE OR REPLACE FUNCTION get_partner_progress(partner_user_id UUID)
+RETURNS TABLE (
+  current_date_value TEXT,
+  progress JSONB
+) AS $$
+BEGIN
+  -- Check if partnership exists and is accepted
+  IF EXISTS (
+    SELECT 1 FROM partnerships
+    WHERE (
+      (user1_id = auth.uid() AND user2_id = partner_user_id) OR
+      (user1_id = partner_user_id AND user2_id = auth.uid())
+    )
+    AND status = 'accepted'
+  ) THEN
+    RETURN QUERY
+    SELECT up.current_date_value, up.progress
+    FROM user_progress up
+    WHERE up.user_id = partner_user_id;
+  END IF;
+  
+  RETURN;
+END;
+$$ LANGUAGE plpgsql SECURITY DEFINER;
+
+-- Alternative: RLS policy to allow viewing partner's progress
+-- This allows partners to see each other's progress
+CREATE POLICY "Users can view partner progress"
+  ON user_progress
+  FOR SELECT
+  USING (
+    auth.uid() = user_id OR
+    EXISTS (
+      SELECT 1 FROM partnerships
+      WHERE (
+        (user1_id = auth.uid() AND user2_id = user_progress.user_id) OR
+        (user1_id = user_progress.user_id AND user2_id = auth.uid())
+      )
+      AND status = 'accepted'
+    )
+  );
+

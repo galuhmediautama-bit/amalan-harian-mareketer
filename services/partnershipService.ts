@@ -229,13 +229,33 @@ export const getPartnerProgress = async (partnerUserId: string): Promise<AppStat
 
     if (!partnership) return null;
 
-    // Use RPC function to get partner progress (bypasses RLS)
-    const { data, error } = await supabase
-      .rpc('get_partner_progress', { partner_user_id: partnerUserId });
+    // Try using RPC function first, fallback to direct query if RPC doesn't exist
+    let result: any = null;
+    
+    try {
+      const { data: rpcData, error: rpcError } = await supabase
+        .rpc('get_partner_progress', { partner_user_id: partnerUserId });
+      
+      if (!rpcError && rpcData && rpcData.length > 0) {
+        result = rpcData[0];
+      }
+    } catch (rpcErr) {
+      // RPC function might not exist yet, try direct query
+      console.log('RPC function not available, trying direct query');
+    }
 
-    if (error || !data || data.length === 0) return null;
+    // Fallback: Direct query (requires RLS policy to allow viewing partner's data)
+    if (!result) {
+      const { data, error } = await supabase
+        .from('user_progress')
+        .select('current_date_value, progress')
+        .eq('user_id', partnerUserId)
+        .maybeSingle();
 
-    const result = data[0];
+      if (error || !data) return null;
+      result = data;
+    }
+
     return {
       currentDate: result.current_date_value || new Date().toISOString().split('T')[0],
       progress: (result.progress as Record<string, any>) || {}
