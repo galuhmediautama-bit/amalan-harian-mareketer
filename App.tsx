@@ -14,7 +14,11 @@ import {
   Info,
   Star,
   Moon,
-  LogOut
+  LogOut,
+  Users,
+  UserPlus,
+  MessageCircle,
+  Trophy
 } from 'lucide-react';
 import { HABITS, MINGGUAN, EMERGENCY } from './constants';
 import { Habit, HabitCategory, DailyProgress, AppState } from './types';
@@ -61,7 +65,7 @@ const App: React.FC = () => {
     };
   });
 
-  const [activeTab, setActiveTab] = useState<'daily' | 'stats' | 'emergency'>('daily');
+  const [activeTab, setActiveTab] = useState<'daily' | 'stats' | 'emergency' | 'together'>('daily');
   const [expandedHabitId, setExpandedHabitId] = useState<string | null>(null);
   const [isSaving, setIsSaving] = useState(false);
   const [currentPrinsipIndex, setCurrentPrinsipIndex] = useState(0);
@@ -572,6 +576,164 @@ const App: React.FC = () => {
                 </p>
               </Card>
             </div>
+          </div>
+        )}
+
+        {activeTab === 'together' && (
+          <div className="space-y-4 pb-8">
+            {/* Header Section */}
+            <Card className="p-4 bg-gradient-to-br from-purple-50 via-purple-50/90 to-pink-50 border-2 border-purple-300/80 shadow-xl ring-1 ring-purple-200/50">
+              <div className="flex items-center gap-3 mb-3">
+                <div className="p-2 bg-purple-600 rounded-xl shadow-lg">
+                  <Users className="w-5 h-5 text-white" />
+                </div>
+                <div>
+                  <h2 className="text-base font-black text-purple-950 uppercase tracking-tight">Evaluasi Bersama</h2>
+                  <p className="text-[11px] text-purple-700 font-black">Accountability Partner</p>
+                </div>
+              </div>
+              <p className="text-xs text-purple-900 font-semibold leading-relaxed">
+                Evaluasi bersama rekan kerja atau pasangan untuk saling memotivasi dan menjaga konsistensi amalan harian.
+              </p>
+            </Card>
+
+            {/* Partner Status */}
+            <Card className="p-4 bg-white border-2 border-slate-200 shadow-lg">
+              <h3 className="font-black text-sm mb-3 flex items-center gap-2 text-slate-950 uppercase tracking-tight">
+                <UserPlus className="w-4 h-4 text-teal-700" />
+                <span>Partner Saya</span>
+              </h3>
+              <div className="space-y-3">
+                {/* No Partner State */}
+                <div className="p-4 rounded-xl bg-slate-50 border-2 border-dashed border-slate-300 text-center">
+                  <Users className="w-8 h-8 text-slate-400 mx-auto mb-2" />
+                  <p className="text-xs font-black text-slate-600 mb-3">Belum ada partner</p>
+                  <button className="px-4 py-2 bg-gradient-to-r from-purple-600 to-purple-500 text-white text-xs font-black rounded-lg shadow-lg hover:shadow-xl transition-all active:scale-95">
+                    + Invite Partner
+                  </button>
+                </div>
+
+                {/* Partner Card (Example - akan diimplementasi dengan data real) */}
+                {/* <div className="p-3 rounded-xl bg-gradient-to-r from-teal-50 to-teal-100/50 border-2 border-teal-300">
+                  <div className="flex items-center justify-between mb-2">
+                    <div className="flex items-center gap-2">
+                      <div className="w-10 h-10 rounded-full bg-teal-600 flex items-center justify-center text-white font-black text-sm">
+                        JD
+                      </div>
+                      <div>
+                        <p className="text-sm font-black text-slate-950">John Doe</p>
+                        <p className="text-[10px] text-slate-600">Partner sejak 15 Des 2024</p>
+                      </div>
+                    </div>
+                    <button className="p-2 rounded-lg bg-slate-100 hover:bg-slate-200 transition-colors">
+                      <MessageCircle className="w-4 h-4 text-slate-600" />
+                    </button>
+                  </div>
+                  <div className="flex items-center gap-4 text-xs">
+                    <div>
+                      <p className="text-slate-500 font-black">Progress Hari Ini</p>
+                      <p className="text-teal-900 font-black text-sm">75%</p>
+                    </div>
+                    <div>
+                      <p className="text-slate-500 font-black">Streak</p>
+                      <p className="text-teal-900 font-black text-sm">12 hari</p>
+                    </div>
+                  </div>
+                </div> */}
+              </div>
+            </Card>
+
+            {/* Comparison View */}
+            <Card className="p-4 bg-white border-2 border-slate-200 shadow-lg">
+              <h3 className="font-black text-sm mb-3 flex items-center gap-2 text-slate-950 uppercase tracking-tight">
+                <Trophy className="w-4 h-4 text-amber-600" />
+                <span>Perbandingan Progress</span>
+              </h3>
+              <div className="space-y-3">
+                <div className="p-3 rounded-xl bg-slate-50 border-2 border-slate-200">
+                  <p className="text-xs text-slate-500 font-black mb-2">Hari Ini</p>
+                  <div className="space-y-2">
+                    <div className="flex items-center justify-between">
+                      <span className="text-xs font-black text-slate-700">Saya</span>
+                      <div className="flex-1 mx-3 h-3 bg-slate-200 rounded-full overflow-hidden">
+                        <div className="h-full bg-gradient-to-r from-teal-500 to-teal-400 rounded-full" style={{ width: `${completionPercentage}%` }}></div>
+                      </div>
+                      <span className="text-xs font-black text-slate-950 w-12 text-right">{completionPercentage}%</span>
+                    </div>
+                    <div className="flex items-center justify-between opacity-50">
+                      <span className="text-xs font-black text-slate-700">Partner</span>
+                      <div className="flex-1 mx-3 h-3 bg-slate-200 rounded-full overflow-hidden">
+                        <div className="h-full bg-gradient-to-r from-purple-500 to-purple-400 rounded-full" style={{ width: '0%' }}></div>
+                      </div>
+                      <span className="text-xs font-black text-slate-950 w-12 text-right">-</span>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="p-3 rounded-xl bg-slate-50 border-2 border-slate-200">
+                  <p className="text-xs text-slate-500 font-black mb-2">Minggu Ini (Rata-rata)</p>
+                  <div className="space-y-2">
+                    <div className="flex items-center justify-between">
+                      <span className="text-xs font-black text-slate-700">Saya</span>
+                      <div className="flex-1 mx-3 h-3 bg-slate-200 rounded-full overflow-hidden">
+                        <div className="h-full bg-gradient-to-r from-teal-500 to-teal-400 rounded-full" style={{ width: `${Math.round(statsData.reduce((acc, curr) => acc + curr.points, 0) / (statsData.length || 1) / totalPointsPossible * 100)}%` }}></div>
+                      </div>
+                      <span className="text-xs font-black text-slate-950 w-12 text-right">
+                        {Math.round(statsData.reduce((acc, curr) => acc + curr.points, 0) / (statsData.length || 1) / totalPointsPossible * 100)}%
+                      </span>
+                    </div>
+                    <div className="flex items-center justify-between opacity-50">
+                      <span className="text-xs font-black text-slate-700">Partner</span>
+                      <div className="flex-1 mx-3 h-3 bg-slate-200 rounded-full overflow-hidden">
+                        <div className="h-full bg-gradient-to-r from-purple-500 to-purple-400 rounded-full" style={{ width: '0%' }}></div>
+                      </div>
+                      <span className="text-xs font-black text-slate-950 w-12 text-right">-</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </Card>
+
+            {/* Messages/Feedback Section */}
+            <Card className="p-4 bg-white border-2 border-slate-200 shadow-lg">
+              <h3 className="font-black text-sm mb-3 flex items-center gap-2 text-slate-950 uppercase tracking-tight">
+                <MessageCircle className="w-4 h-4 text-blue-600" />
+                <span>Pesan & Motivasi</span>
+              </h3>
+              <div className="space-y-3">
+                <div className="p-4 rounded-xl bg-slate-50 border-2 border-dashed border-slate-300 text-center">
+                  <MessageCircle className="w-8 h-8 text-slate-400 mx-auto mb-2" />
+                  <p className="text-xs font-black text-slate-600 mb-3">Belum ada partner untuk saling memberikan motivasi</p>
+                  <p className="text-[10px] text-slate-500">Invite partner untuk mulai saling memberikan feedback</p>
+                </div>
+              </div>
+            </Card>
+
+            {/* How It Works */}
+            <Card className="p-4 bg-gradient-to-br from-blue-50 to-indigo-50 border-2 border-blue-200 shadow-lg">
+              <h3 className="font-black text-sm mb-3 flex items-center gap-2 text-blue-950 uppercase tracking-tight">
+                <Info className="w-4 h-4 text-blue-700" />
+                <span>Cara Kerja</span>
+              </h3>
+              <div className="space-y-2.5">
+                {[
+                  { step: '1', title: 'Invite Partner', desc: 'Kirim undangan ke rekan kerja atau pasangan via email' },
+                  { step: '2', title: 'Terima Undangan', desc: 'Partner menerima dan menerima undangan' },
+                  { step: '3', title: 'Saling Melihat Progress', desc: 'Lihat progress harian dan mingguan partner' },
+                  { step: '4', title: 'Saling Memotivasi', desc: 'Kirim pesan motivasi dan feedback untuk saling mendukung' }
+                ].map((item) => (
+                  <div key={item.step} className="flex gap-3 items-start">
+                    <div className="w-6 h-6 rounded-lg bg-blue-600 text-white flex items-center justify-center font-black text-xs shrink-0">
+                      {item.step}
+                    </div>
+                    <div>
+                      <p className="text-xs font-black text-blue-950 mb-0.5">{item.title}</p>
+                      <p className="text-[11px] text-blue-800 leading-snug">{item.desc}</p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </Card>
           </div>
         )}
 
