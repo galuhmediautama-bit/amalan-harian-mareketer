@@ -1,5 +1,3 @@
-
-import React from 'react';
 import { Habit, HabitCategory } from './types';
 
 export const HABITS: Habit[] = [
