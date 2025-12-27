@@ -842,7 +842,6 @@ const App: React.FC = () => {
                 </Card>
               </div>
             )}
-            </Card>
 
             {/* Comparison View */}
             <Card className="p-4 bg-white border-2 border-slate-200 shadow-lg">
