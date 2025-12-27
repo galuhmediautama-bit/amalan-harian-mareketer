@@ -25,7 +25,7 @@ export const getUserData = async (): Promise<AppState | null> => {
     if (!data) return null;
 
     return {
-      currentDate: data.current_date || new Date().toISOString().split('T')[0],
+      currentDate: data.current_date_value || new Date().toISOString().split('T')[0],
       progress: (data.progress as Record<string, DailyProgress>) || {}
     };
   } catch (error) {
@@ -46,7 +46,7 @@ export const saveUserData = async (state: AppState): Promise<void> => {
       .from(TABLE_NAME)
       .upsert({
         user_id: user.id,
-        current_date: state.currentDate,
+        current_date_value: state.currentDate,
         progress: state.progress,
         updated_at: new Date().toISOString()
       }, {

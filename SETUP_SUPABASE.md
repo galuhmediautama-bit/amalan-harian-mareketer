@@ -47,7 +47,7 @@ RLS sudah di-setup otomatis dari SQL schema, tapi pastikan:
 |--------|------|-------------|
 | `id` | BIGSERIAL | Primary key |
 | `user_id` | UUID | Foreign key ke auth.users |
-| `current_date` | TEXT | Tanggal terakhir diakses |
+| `current_date_value` | TEXT | Tanggal terakhir diakses |
 | `progress` | JSONB | Data progress harian |
 | `updated_at` | TIMESTAMPTZ | Timestamp update |
 | `created_at` | TIMESTAMPTZ | Timestamp create |

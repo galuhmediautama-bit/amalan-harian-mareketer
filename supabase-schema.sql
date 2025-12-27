@@ -4,7 +4,7 @@
 CREATE TABLE IF NOT EXISTS user_progress (
   id BIGSERIAL PRIMARY KEY,
   user_id UUID NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
-  current_date TEXT NOT NULL,
+  current_date_value TEXT NOT NULL,
   progress JSONB NOT NULL DEFAULT '{}'::jsonb,
   updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
   created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
