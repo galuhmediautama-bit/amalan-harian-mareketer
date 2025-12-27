@@ -26,8 +26,6 @@ const Login: React.FC<LoginProps> = ({ onLoginSuccess }) => {
         await signIn(email, password);
       }
       // onAuthChange will automatically update the user state and redirect
-      // Keep loading state true until onAuthChange triggers (handled by App component)
-      // Don't set loading to false here - let the auth state change handle it
     } catch (err: any) {
       setError(err.message || 'Terjadi kesalahan');
       setLoading(false);

@@ -21,7 +21,7 @@ import { Habit, HabitCategory, DailyProgress, AppState } from './types';
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 import Login from './components/Login';
 import { onAuthChange, signOutUser, getCurrentUser } from './services/authService';
-import { getUserData, saveUserData, subscribeToUserData, migrateFromLocalStorage } from './services/storageService';
+import { getUserData, saveUserData, subscribeToUserData, migrateFromLocalStorage } from './services/supabaseService';
 
 // Helper components
 const Card: React.FC<{ children: React.ReactNode, className?: string }> = ({ children, className = "" }) => (
@@ -73,7 +73,7 @@ const App: React.FC = () => {
       setUser(currentUser);
       
       if (currentUser) {
-        // Load data from localStorage
+        // Load data from Supabase
         try {
           await migrateFromLocalStorage();
           
@@ -82,7 +82,7 @@ const App: React.FC = () => {
             setState(userData);
           }
 
-          // Subscribe to data changes
+          // Subscribe to real-time data changes
           unsubscribeStorage = subscribeToUserData((updatedState) => {
             if (updatedState) {
               setState(updatedState);
@@ -104,7 +104,7 @@ const App: React.FC = () => {
     };
   }, []);
 
-  // Save to localStorage when state changes (debounced)
+  // Save to Supabase when state changes (debounced)
   useEffect(() => {
     if (!user) return;
 
@@ -165,6 +165,7 @@ const App: React.FC = () => {
   const handleLogout = async () => {
     try {
       await signOutUser();
+      setUser(null);
       setState({
         currentDate: new Date().toISOString().split('T')[0],
         progress: {}
@@ -222,7 +223,6 @@ const App: React.FC = () => {
   }
 
   if (!user) {
-    // onAuthChange will automatically update user state, no callback needed
     return <Login onLoginSuccess={() => {}} />;
   }
 
