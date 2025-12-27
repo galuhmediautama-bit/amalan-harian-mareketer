@@ -22,12 +22,12 @@ import {
 } from 'lucide-react';
 import { HABITS, MINGGUAN, EMERGENCY } from './constants';
 import { Habit, HabitCategory, DailyProgress, AppState } from './types';
-import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 import Login from './components/Login';
 import { onAuthChange, signOutUser, getCurrentUser } from './services/authService';
 import { getUserData, saveUserData, subscribeToUserData, migrateFromLocalStorage } from './services/supabaseService';
-import { getMyPartnership, getPendingInvitations, invitePartnerById, acceptPartnership, rejectPartnership, getPartnerProgress, subscribeToPartnership, Partnership } from './services/partnershipService';
-import { getMessages, sendMessage, subscribeToMessages, Message } from './services/messageService';
+
+// Lazy load heavy dependencies - only load when needed
+const StatsChart = React.lazy(() => import('./components/StatsChart'));
 
 // Helper components
 const Card: React.FC<{ children: React.ReactNode, className?: string }> = ({ children, className = "" }) => (
@@ -138,18 +138,25 @@ const App: React.FC = () => {
     return () => clearTimeout(timeoutId);
   }, [state, user]);
 
-  // Load partnership data
+  // Load partnership data - only when together tab is active or user has partnership
   useEffect(() => {
-    if (!user) {
-      setPartnership(null);
-      setPendingInvitations({ sent: [], received: [] });
-      setPartnerProgress(null);
-      setMessages([]);
+    if (!user || activeTab !== 'together') {
+      // Don't load if not on together tab (lazy loading)
       return;
     }
 
+    let partnershipServices: any = null;
+    let unsubscribe: (() => void) | null = null;
+
     const loadPartnershipData = async () => {
       try {
+        // Dynamically import partnership services only when needed
+        if (!partnershipServices) {
+          partnershipServices = await import('./services/partnershipService');
+        }
+
+        const { getMyPartnership, getPendingInvitations, getPartnerProgress, subscribeToPartnership } = partnershipServices;
+        
         const [myPartnership, invitations] = await Promise.all([
           getMyPartnership(),
           getPendingInvitations()
@@ -165,6 +172,17 @@ const App: React.FC = () => {
         } else {
           setPartnerProgress(null);
         }
+
+        // Subscribe to partnership changes
+        unsubscribe = subscribeToPartnership((updatedPartnership: Partnership | null) => {
+          setPartnership(updatedPartnership);
+          if (updatedPartnership && user) {
+            const partnerId = updatedPartnership.user1_id === user.id ? updatedPartnership.user2_id : updatedPartnership.user1_id;
+            getPartnerProgress(partnerId).then(setPartnerProgress);
+          } else {
+            setPartnerProgress(null);
+          }
+        });
       } catch (error) {
         console.error('Error loading partnership data:', error);
       }
@@ -172,35 +190,40 @@ const App: React.FC = () => {
 
     loadPartnershipData();
 
-    // Subscribe to partnership changes
-    const unsubscribe = subscribeToPartnership((updatedPartnership) => {
-      setPartnership(updatedPartnership);
-      if (updatedPartnership && user) {
-        const partnerId = updatedPartnership.user1_id === user.id ? updatedPartnership.user2_id : updatedPartnership.user1_id;
-        getPartnerProgress(partnerId).then(setPartnerProgress);
-      } else {
-        setPartnerProgress(null);
-      }
-    });
-
     return () => {
-      unsubscribe();
+      if (unsubscribe) {
+        unsubscribe();
+      }
     };
-  }, [user]);
+  }, [user, activeTab]);
 
-  // Load messages when partnership exists
+  // Load messages when partnership exists - only when together tab is active
   useEffect(() => {
-    if (!user || !partnership) {
+    if (!user || !partnership || activeTab !== 'together') {
       setMessages([]);
       return;
     }
 
-    const partnerId = partnership.user1_id === user.id ? partnership.user2_id : partnership.user1_id;
-    
+    let messageService: any = null;
+    let unsubscribe: (() => void) | null = null;
+
     const loadMessages = async () => {
       try {
+        // Dynamically import message service only when needed
+        if (!messageService) {
+          messageService = await import('./services/messageService');
+        }
+
+        const { getMessages, subscribeToMessages } = messageService;
+        const partnerId = partnership.user1_id === user.id ? partnership.user2_id : partnership.user1_id;
+        
         const msgs = await getMessages(partnerId);
         setMessages(msgs);
+
+        // Subscribe to message changes
+        unsubscribe = subscribeToMessages(partnerId, (updatedMessages: Message[]) => {
+          setMessages(updatedMessages);
+        });
       } catch (error) {
         console.error('Error loading messages:', error);
       }
@@ -208,15 +231,12 @@ const App: React.FC = () => {
 
     loadMessages();
 
-    // Subscribe to message changes
-    const unsubscribe = subscribeToMessages(partnerId, (updatedMessages) => {
-      setMessages(updatedMessages);
-    });
-
     return () => {
-      unsubscribe();
+      if (unsubscribe) {
+        unsubscribe();
+      }
     };
-  }, [user, partnership]);
+  }, [user, partnership, activeTab]);
 
   // All hooks must be called before early returns
   const today = state.currentDate;
@@ -712,10 +732,11 @@ const App: React.FC = () => {
                           <button
                             onClick={async () => {
                               try {
-                                await acceptPartnership(inv.id);
+                                const partnershipService = await import('./services/partnershipService');
+                                await partnershipService.acceptPartnership(inv.id);
                                 const [updatedPartnership, updatedInvitations] = await Promise.all([
-                                  getMyPartnership(),
-                                  getPendingInvitations()
+                                  partnershipService.getMyPartnership(),
+                                  partnershipService.getPendingInvitations()
                                 ]);
                                 setPartnership(updatedPartnership);
                                 setPendingInvitations(updatedInvitations);
@@ -730,8 +751,9 @@ const App: React.FC = () => {
                           <button
                             onClick={async () => {
                               try {
-                                await rejectPartnership(inv.id);
-                                const updatedInvitations = await getPendingInvitations();
+                                const partnershipService = await import('./services/partnershipService');
+                                await partnershipService.rejectPartnership(inv.id);
+                                const updatedInvitations = await partnershipService.getPendingInvitations();
                                 setPendingInvitations(updatedInvitations);
                               } catch (error: any) {
                                 alert(error.message || 'Error rejecting partnership');
@@ -816,10 +838,11 @@ const App: React.FC = () => {
                     <button
                       onClick={async () => {
                         try {
-                          await invitePartnerById(inviteEmail);
+                          const partnershipService = await import('./services/partnershipService');
+                          await partnershipService.invitePartnerById(inviteEmail);
                           setShowInviteModal(false);
                           setInviteEmail('');
-                          const updatedInvitations = await getPendingInvitations();
+                          const updatedInvitations = await partnershipService.getPendingInvitations();
                           setPendingInvitations(updatedInvitations);
                         } catch (error: any) {
                           alert(error.message || 'Error inviting partner');
@@ -994,13 +1017,18 @@ const App: React.FC = () => {
                         type="text"
                         value={newMessage}
                         onChange={(e) => setNewMessage(e.target.value)}
-                        onKeyPress={(e) => {
+                        onKeyPress={async (e) => {
                           if (e.key === 'Enter' && newMessage.trim() && partnership) {
-                            const partnerId = partnership.user1_id === user?.id ? partnership.user2_id : partnership.user1_id;
-                            sendMessage(partnerId, newMessage).then(() => {
+                            try {
+                              const messageService = await import('./services/messageService');
+                              const partnerId = partnership.user1_id === user?.id ? partnership.user2_id : partnership.user1_id;
+                              await messageService.sendMessage(partnerId, newMessage);
                               setNewMessage('');
-                              getMessages(partnerId).then(setMessages);
-                            }).catch(alert);
+                              const updatedMessages = await messageService.getMessages(partnerId);
+                              setMessages(updatedMessages);
+                            } catch (error: any) {
+                              alert(error.message || 'Error sending message');
+                            }
                           }
                         }}
                         placeholder="Tulis pesan motivasi..."
@@ -1009,11 +1037,12 @@ const App: React.FC = () => {
                       <button
                         onClick={async () => {
                           if (!newMessage.trim() || !partnership) return;
-                          const partnerId = partnership.user1_id === user?.id ? partnership.user2_id : partnership.user1_id;
                           try {
-                            await sendMessage(partnerId, newMessage);
+                            const messageService = await import('./services/messageService');
+                            const partnerId = partnership.user1_id === user?.id ? partnership.user2_id : partnership.user1_id;
+                            await messageService.sendMessage(partnerId, newMessage);
                             setNewMessage('');
-                            const updatedMessages = await getMessages(partnerId);
+                            const updatedMessages = await messageService.getMessages(partnerId);
                             setMessages(updatedMessages);
                           } catch (error: any) {
                             alert(error.message || 'Error sending message');
