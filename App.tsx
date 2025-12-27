@@ -31,11 +31,11 @@ const Card: React.FC<{ children: React.ReactNode, className?: string }> = ({ chi
 );
 
 const SectionHeader: React.FC<{ title: string, icon: React.ReactNode }> = ({ title, icon }) => (
-  <div className="flex items-center gap-2 mb-3 sm:mb-4 mt-6 sm:mt-8">
-    <div className="p-1.5 sm:p-2 bg-teal-100 text-teal-900 rounded-lg shrink-0">
+  <div className="flex items-center gap-2 mb-2 sm:mb-3 mt-4 sm:mt-5">
+    <div className="p-1 sm:p-1.5 bg-teal-100 text-teal-900 rounded-lg shrink-0">
       {icon}
     </div>
-    <h2 className="text-base sm:text-lg font-black text-slate-900 uppercase tracking-tight leading-tight">{title}</h2>
+    <h2 className="text-sm sm:text-base font-black text-slate-900 uppercase tracking-tight leading-tight">{title}</h2>
   </div>
 );
 
@@ -247,56 +247,56 @@ const App: React.FC = () => {
   }
 
   return (
-    <div className="max-w-xl mx-auto min-h-screen pb-24 sm:pb-28">
+    <div className="max-w-xl mx-auto min-h-screen pb-20 sm:pb-24">
       {/* Header */}
-      <header className="bg-teal-900 text-white pt-6 sm:pt-10 pb-10 sm:pb-14 px-4 sm:px-6 rounded-b-[2rem] sm:rounded-b-[3rem] shadow-2xl relative overflow-hidden">
-        <div className="absolute top-0 right-0 w-48 h-48 sm:w-64 sm:h-64 bg-teal-800 rounded-full -mr-16 sm:-mr-24 -mt-16 sm:-mt-24 opacity-30 blur-3xl"></div>
+      <header className="bg-teal-900 text-white pt-4 sm:pt-6 pb-6 sm:pb-8 px-4 sm:px-6 rounded-b-[1.5rem] sm:rounded-b-[2rem] shadow-2xl relative overflow-hidden">
+        <div className="absolute top-0 right-0 w-32 h-32 sm:w-48 sm:h-48 bg-teal-800 rounded-full -mr-12 sm:-mr-20 -mt-12 sm:-mt-20 opacity-30 blur-3xl"></div>
         <div className="relative z-10">
-          <div className="flex justify-between items-start mb-4 sm:mb-6">
+          <div className="flex justify-between items-start mb-3 sm:mb-4">
             <div className="flex-1 pr-2">
-              <h1 className="text-2xl sm:text-3xl font-black tracking-tighter leading-tight">Marketer Berkah</h1>
-              <p className="text-teal-300 text-[10px] sm:text-xs font-black uppercase tracking-wider sm:tracking-widest mt-1 sm:mt-1.5 leading-relaxed">
+              <h1 className="text-xl sm:text-2xl font-black tracking-tighter leading-tight">Marketer Berkah</h1>
+              <p className="text-teal-300 text-[9px] sm:text-[10px] font-black uppercase tracking-wider mt-0.5 sm:mt-1 leading-tight">
                 Traffic berkah • Conversion stabil • Cashflow sehat
               </p>
             </div>
-            <div className="flex items-center gap-2">
-              <div className="bg-teal-800 p-2.5 sm:p-3 rounded-xl sm:rounded-2xl border border-teal-600 shadow-xl shrink-0">
-                <Calendar className="w-5 h-5 sm:w-6 sm:h-6 text-white" />
+            <div className="flex items-center gap-1.5 sm:gap-2">
+              <div className="bg-teal-800 p-2 sm:p-2.5 rounded-lg sm:rounded-xl border border-teal-600 shadow-lg shrink-0">
+                <Calendar className="w-4 h-4 sm:w-5 sm:h-5 text-white" />
               </div>
               <button
                 onClick={handleLogout}
-                className="bg-teal-800/80 hover:bg-teal-800 p-2.5 sm:p-3 rounded-xl sm:rounded-2xl border border-teal-600 shadow-xl shrink-0 transition-colors"
+                className="bg-teal-800/80 hover:bg-teal-800 p-2 sm:p-2.5 rounded-lg sm:rounded-xl border border-teal-600 shadow-lg shrink-0 transition-colors"
                 title="Logout"
               >
-                <LogOut className="w-5 h-5 sm:w-6 sm:h-6 text-white" />
+                <LogOut className="w-4 h-4 sm:w-5 sm:h-5 text-white" />
               </button>
               {isSaving && (
-                <div className="text-xs text-teal-300 font-black animate-pulse">
+                <div className="text-[10px] sm:text-xs text-teal-300 font-black animate-pulse">
                   Saving...
                 </div>
               )}
             </div>
           </div>
 
-          <div className="bg-white/10 p-4 sm:p-6 rounded-2xl sm:rounded-3xl border border-white/20 mt-6 sm:mt-8 shadow-inner backdrop-blur-sm">
-            <div className="flex justify-between items-end mb-2 sm:mb-3">
-              <span className="text-[10px] sm:text-[11px] font-black text-white uppercase tracking-[0.2em] sm:tracking-[0.25em]">Progress Hari Ini</span>
-              <span className="text-3xl sm:text-4xl font-black">{completionPercentage}%</span>
+          <div className="bg-white/10 p-3 sm:p-4 rounded-xl sm:rounded-2xl border border-white/20 mt-4 sm:mt-5 shadow-inner backdrop-blur-sm">
+            <div className="flex justify-between items-end mb-1.5 sm:mb-2">
+              <span className="text-[9px] sm:text-[10px] font-black text-white uppercase tracking-[0.15em]">Progress Hari Ini</span>
+              <span className="text-2xl sm:text-3xl font-black">{completionPercentage}%</span>
             </div>
-            <div className="h-4 sm:h-5 w-full bg-teal-950/60 rounded-full overflow-hidden border border-white/10">
+            <div className="h-3 sm:h-4 w-full bg-teal-950/60 rounded-full overflow-hidden border border-white/10">
               <div 
-                className="h-full bg-gradient-to-r from-teal-500 to-teal-200 rounded-full transition-all duration-1000 ease-out shadow-[0_0_15px_rgba(45,212,191,0.5)]" 
+                className="h-full bg-gradient-to-r from-teal-500 to-teal-200 rounded-full transition-all duration-1000 ease-out shadow-[0_0_10px_rgba(45,212,191,0.5)]" 
                 style={{ width: `${completionPercentage}%` }}
               ></div>
             </div>
           </div>
 
           {/* Prinsip Dasar Rotator */}
-          <div className="mt-6 sm:mt-8 flex items-center gap-3 sm:gap-4 bg-white/10 p-4 sm:p-5 rounded-2xl sm:rounded-3xl border border-white/20 backdrop-blur-sm">
-            <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-gradient-to-br from-yellow-400 to-yellow-500 flex items-center justify-center font-black text-teal-900 text-lg sm:text-xl shadow-lg shrink-0 border-2 border-yellow-300 animate-pulse">
+          <div className="mt-4 sm:mt-5 flex items-center gap-2 sm:gap-3 bg-white/10 p-3 sm:p-4 rounded-xl sm:rounded-2xl border border-white/20 backdrop-blur-sm">
+            <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-gradient-to-br from-yellow-400 to-yellow-500 flex items-center justify-center font-black text-teal-900 text-sm sm:text-base shadow-lg shrink-0 border-2 border-yellow-300 animate-pulse">
               {currentPrinsipIndex + 1}
             </div>
-            <p className="text-[12px] sm:text-[14px] text-white font-black leading-relaxed flex-1 transition-opacity duration-500">
+            <p className="text-[11px] sm:text-[12px] text-white font-black leading-snug flex-1 transition-opacity duration-500">
               {prinsipDasar[currentPrinsipIndex]}
             </p>
           </div>
@@ -304,70 +304,70 @@ const App: React.FC = () => {
       </header>
 
       {/* Navigation Tabs */}
-      <div className="px-4 sm:px-5 -mt-6 sm:-mt-8 relative z-20">
-        <div className="bg-white rounded-2xl sm:rounded-3xl shadow-2xl border-2 border-slate-200 p-2 sm:p-2.5 flex gap-2 sm:gap-2.5 relative overflow-hidden">
+      <div className="px-4 sm:px-5 -mt-4 sm:-mt-5 relative z-20">
+        <div className="bg-white rounded-xl sm:rounded-2xl shadow-xl border-2 border-slate-200 p-1.5 sm:p-2 flex gap-1.5 sm:gap-2 relative overflow-hidden">
           {/* Animated background indicator with gradient */}
           <div 
-            className={`absolute top-2 sm:top-2.5 bottom-2 sm:bottom-2.5 rounded-xl sm:rounded-2xl bg-gradient-to-r from-teal-700 to-teal-600 transition-all duration-500 ease-out shadow-xl shadow-teal-500/30 ${
-              activeTab === 'daily' ? 'left-2 sm:left-2.5 w-[calc(33.333%-1rem)]' :
-              activeTab === 'stats' ? 'left-[calc(33.333%+0.5rem)] w-[calc(33.333%-1rem)]' :
-              'left-[calc(66.666%+0.5rem)] w-[calc(33.333%-1rem)]'
+            className={`absolute top-1.5 sm:top-2 bottom-1.5 sm:bottom-2 rounded-lg sm:rounded-xl bg-gradient-to-r from-teal-700 to-teal-600 transition-all duration-500 ease-out shadow-lg shadow-teal-500/30 ${
+              activeTab === 'daily' ? 'left-1.5 sm:left-2 w-[calc(33.333%-0.75rem)]' :
+              activeTab === 'stats' ? 'left-[calc(33.333%+0.25rem)] w-[calc(33.333%-0.75rem)]' :
+              'left-[calc(66.666%+0.25rem)] w-[calc(33.333%-0.75rem)]'
             }`}
           />
           <button 
             onClick={() => setActiveTab('daily')}
-            className={`flex-1 py-3.5 sm:py-4 px-3 sm:px-4 rounded-xl sm:rounded-2xl text-[12px] sm:text-[13px] font-black transition-all duration-300 flex items-center justify-center gap-2 sm:gap-2.5 min-h-[48px] relative z-10 ${
+            className={`flex-1 py-2.5 sm:py-3 px-2 sm:px-3 rounded-lg sm:rounded-xl text-[11px] sm:text-[12px] font-black transition-all duration-300 flex items-center justify-center gap-1.5 sm:gap-2 min-h-[40px] relative z-10 ${
               activeTab === 'daily' 
                 ? 'text-white transform scale-[1.02]' 
                 : 'text-slate-700 hover:text-teal-700 active:scale-95'
             }`}
           >
-            <CheckCircle className={`w-4 h-4 sm:w-5 sm:h-5 transition-all ${activeTab === 'daily' ? 'scale-110 drop-shadow-lg' : ''}`} /> 
+            <CheckCircle className={`w-3.5 h-3.5 sm:w-4 sm:h-4 transition-all ${activeTab === 'daily' ? 'scale-110 drop-shadow-lg' : ''}`} /> 
             <span>HARIAN</span>
           </button>
           <button 
             onClick={() => setActiveTab('stats')}
-            className={`flex-1 py-3.5 sm:py-4 px-3 sm:px-4 rounded-xl sm:rounded-2xl text-[12px] sm:text-[13px] font-black transition-all duration-300 flex items-center justify-center gap-2 sm:gap-2.5 min-h-[48px] relative z-10 ${
+            className={`flex-1 py-2.5 sm:py-3 px-2 sm:px-3 rounded-lg sm:rounded-xl text-[11px] sm:text-[12px] font-black transition-all duration-300 flex items-center justify-center gap-1.5 sm:gap-2 min-h-[40px] relative z-10 ${
               activeTab === 'stats' 
                 ? 'text-white transform scale-[1.02]' 
                 : 'text-slate-700 hover:text-teal-700 active:scale-95'
             }`}
           >
-            <TrendingUp className={`w-4 h-4 sm:w-5 sm:h-5 transition-all ${activeTab === 'stats' ? 'scale-110 drop-shadow-lg' : ''}`} /> 
+            <TrendingUp className={`w-3.5 h-3.5 sm:w-4 sm:h-4 transition-all ${activeTab === 'stats' ? 'scale-110 drop-shadow-lg' : ''}`} /> 
             <span>GRAFIK</span>
           </button>
           <button 
             onClick={() => setActiveTab('emergency')}
-            className={`flex-1 py-3.5 sm:py-4 px-3 sm:px-4 rounded-xl sm:rounded-2xl text-[12px] sm:text-[13px] font-black transition-all duration-300 flex items-center justify-center gap-2 sm:gap-2.5 min-h-[48px] relative z-10 ${
+            className={`flex-1 py-2.5 sm:py-3 px-2 sm:px-3 rounded-lg sm:rounded-xl text-[11px] sm:text-[12px] font-black transition-all duration-300 flex items-center justify-center gap-1.5 sm:gap-2 min-h-[40px] relative z-10 ${
               activeTab === 'emergency' 
-                ? 'text-white transform scale-[1.02] bg-gradient-to-r from-red-600 to-red-500 rounded-xl sm:rounded-2xl' 
+                ? 'text-white transform scale-[1.02] bg-gradient-to-r from-red-600 to-red-500 rounded-lg sm:rounded-xl' 
                 : 'text-slate-700 hover:text-red-600 active:scale-95'
             }`}
           >
-            <AlertTriangle className={`w-4 h-4 sm:w-5 sm:h-5 transition-all ${activeTab === 'emergency' ? 'scale-110 drop-shadow-lg' : ''}`} /> 
+            <AlertTriangle className={`w-3.5 h-3.5 sm:w-4 sm:h-4 transition-all ${activeTab === 'emergency' ? 'scale-110 drop-shadow-lg' : ''}`} /> 
             <span>BONCOS</span>
           </button>
         </div>
       </div>
 
-      <main className="px-4 sm:px-5 mt-6 sm:mt-10">
+      <main className="px-4 sm:px-5 mt-4 sm:mt-6">
         {activeTab === 'daily' && (
-          <div className="space-y-6">
+          <div className="space-y-4 sm:space-y-5">
             {/* A. PRINSIP DASAR */}
-            <div className="mb-8 sm:mb-10">
-              <SectionHeader title="A. Prinsip Dasar" icon={<Star className="w-4 h-4 sm:w-5 sm:h-5" />} />
-              <Card className="bg-amber-50 border-2 border-amber-300 shadow-xl">
-                <div className="p-4 sm:p-6">
-                  <h3 className="font-black text-amber-950 text-xs sm:text-sm mb-4 sm:mb-5 uppercase tracking-wider flex items-center gap-2">
-                    <Heart className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-amber-700 shrink-0" /> Pegang Setiap Hari
+            <div className="mb-4 sm:mb-6">
+              <SectionHeader title="A. Prinsip Dasar" icon={<Star className="w-3.5 h-3.5 sm:w-4 sm:h-4" />} />
+              <Card className="bg-amber-50 border-2 border-amber-300 shadow-lg">
+                <div className="p-3 sm:p-4">
+                  <h3 className="font-black text-amber-950 text-[11px] sm:text-xs mb-3 sm:mb-4 uppercase tracking-wider flex items-center gap-1.5 sm:gap-2">
+                    <Heart className="w-3 h-3 sm:w-3.5 sm:h-3.5 text-amber-700 shrink-0" /> Pegang Setiap Hari
                   </h3>
-                  <div className="grid gap-3 sm:gap-4">
+                  <div className="grid gap-2 sm:gap-3">
                     {prinsipDasar.map((prinsip, index) => (
-                      <div key={index} className="flex gap-3 sm:gap-4 items-start">
-                        <div className="w-6 h-6 sm:w-7 sm:h-7 rounded-lg sm:rounded-xl bg-amber-200 text-amber-900 flex items-center justify-center font-black text-[10px] sm:text-xs shrink-0 border-2 border-amber-300 shadow-sm">
+                      <div key={index} className="flex gap-2 sm:gap-3 items-start">
+                        <div className="w-5 h-5 sm:w-6 sm:h-6 rounded-lg bg-amber-200 text-amber-900 flex items-center justify-center font-black text-[10px] sm:text-[11px] shrink-0 border-2 border-amber-300 shadow-sm">
                           {index + 1}
                         </div>
-                        <p className="text-[13px] sm:text-[14px] text-slate-950 font-black leading-snug">
+                        <p className="text-[12px] sm:text-[13px] text-slate-950 font-black leading-snug">
                           {prinsip}
                         </p>
                       </div>
@@ -379,38 +379,38 @@ const App: React.FC = () => {
 
             {/* Habit Categories */}
             {(Object.entries(groupedHabits) as [HabitCategory, Habit[]][]).map(([category, habits]) => (
-              <div key={category} className="mb-8 sm:mb-12">
+              <div key={category} className="mb-4 sm:mb-6">
                 <SectionHeader 
                   title={category} 
                   icon={
-                    category === HabitCategory.PAGI_DINI_HARI ? <Moon className="w-4 h-4 sm:w-5 sm:h-5" /> :
-                    category === HabitCategory.KERJA_DIGITAL ? <ShieldCheck className="w-4 h-4 sm:w-5 sm:h-5" /> :
-                    <CheckCircle className="w-4 h-4 sm:w-5 sm:h-5" />
+                    category === HabitCategory.PAGI_DINI_HARI ? <Moon className="w-3.5 h-3.5 sm:w-4 sm:h-4" /> :
+                    category === HabitCategory.KERJA_DIGITAL ? <ShieldCheck className="w-3.5 h-3.5 sm:w-4 sm:h-4" /> :
+                    <CheckCircle className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
                   } 
                 />
-                <div className="space-y-3 sm:space-y-4">
+                <div className="space-y-2 sm:space-y-3">
                   {habits.map(habit => {
                     const isCompleted = todayProgress.completedHabitIds.includes(habit.id);
                     return (
                     <Card key={habit.id} className={`group transition-all duration-500 ease-out ${
                       isCompleted 
                         ? 'bg-gradient-to-br from-teal-50 to-teal-100/50 border-2 border-teal-300/60 shadow-md' 
-                        : 'bg-white border-2 border-slate-200 shadow-lg hover:shadow-2xl hover:border-teal-400 hover:-translate-y-0.5'
+                        : 'bg-white border-2 border-slate-200 shadow-lg hover:shadow-xl hover:border-teal-400'
                     }`}>
-                      <div className="p-4 sm:p-5">
-                        <div className="flex items-center gap-4 sm:gap-5">
+                      <div className="p-3 sm:p-4">
+                        <div className="flex items-center gap-3 sm:gap-4">
                           <button 
                             onClick={() => toggleHabit(habit.id)}
-                            className={`shrink-0 transition-all duration-300 ease-out active:scale-90 min-w-[52px] min-h-[52px] sm:min-w-[56px] sm:min-h-[56px] flex items-center justify-center rounded-2xl ${
+                            className={`shrink-0 transition-all duration-300 ease-out active:scale-90 min-w-[44px] min-h-[44px] sm:min-w-[48px] sm:min-h-[48px] flex items-center justify-center rounded-xl ${
                               isCompleted 
-                                ? 'bg-gradient-to-br from-teal-600 to-teal-700 shadow-lg shadow-teal-500/50 scale-110' 
-                                : 'bg-gradient-to-br from-slate-100 to-slate-200 hover:from-teal-100 hover:to-teal-200 shadow-inner hover:scale-110'
+                                ? 'bg-gradient-to-br from-teal-600 to-teal-700 shadow-lg shadow-teal-500/50 scale-105' 
+                                : 'bg-gradient-to-br from-slate-100 to-slate-200 hover:from-teal-100 hover:to-teal-200 shadow-inner hover:scale-105'
                             }`}
                           >
                             {isCompleted ? (
-                              <CheckCircle className="w-7 h-7 sm:w-8 sm:h-8 text-white fill-white stroke-2 drop-shadow-lg animate-in zoom-in duration-300" />
+                              <CheckCircle className="w-6 h-6 sm:w-7 sm:h-7 text-white fill-white stroke-2 drop-shadow-lg animate-in zoom-in duration-300" />
                             ) : (
-                              <Circle className="w-7 h-7 sm:w-8 sm:h-8 text-slate-500 stroke-[3px] group-hover:text-teal-600 transition-colors" />
+                              <Circle className="w-6 h-6 sm:w-7 sm:h-7 text-slate-500 stroke-[3px] group-hover:text-teal-600 transition-colors" />
                             )}
                           </button>
                           <div 
@@ -453,21 +453,21 @@ const App: React.FC = () => {
                         </div>
 
                         {expandedHabitId === habit.id && habit.prayer && (
-                          <div className="mt-5 sm:mt-6 p-5 sm:p-7 bg-gradient-to-br from-teal-900 via-teal-800 to-teal-900 rounded-2xl sm:rounded-3xl text-white shadow-2xl border-2 border-teal-700/50 backdrop-blur-sm animate-in slide-in-from-top-2 duration-300">
-                            <div className="text-right text-2xl sm:text-3xl font-serif mb-5 sm:mb-6 leading-relaxed tracking-wider drop-shadow-2xl">
+                          <div className="mt-3 sm:mt-4 p-4 sm:p-5 bg-gradient-to-br from-teal-900 via-teal-800 to-teal-900 rounded-xl sm:rounded-2xl text-white shadow-xl border-2 border-teal-700/50 backdrop-blur-sm animate-in slide-in-from-top-2 duration-300">
+                            <div className="text-right text-xl sm:text-2xl font-serif mb-3 sm:mb-4 leading-relaxed tracking-wider drop-shadow-lg">
                               {habit.prayer.arabic}
                             </div>
                             {habit.prayer.latin && (
-                              <p className="text-[12px] sm:text-[13px] italic text-teal-100 mb-4 sm:mb-5 font-semibold border-b border-white/30 pb-4 sm:pb-5 leading-relaxed tracking-wide">
+                              <p className="text-[11px] sm:text-[12px] italic text-teal-100 mb-3 sm:mb-4 font-semibold border-b border-white/30 pb-3 sm:pb-4 leading-relaxed tracking-wide">
                                 {habit.prayer.latin}
                               </p>
                             )}
-                            <p className="text-sm sm:text-base font-bold text-white leading-relaxed">
+                            <p className="text-xs sm:text-sm font-bold text-white leading-relaxed">
                               "{habit.prayer.translation}"
                             </p>
                             {habit.prayer.context && (
-                              <div className="mt-5 sm:mt-6 pt-4 sm:pt-5 border-t border-white/30 text-[11px] sm:text-[12px] text-teal-200 uppercase tracking-wider font-black flex items-center gap-2">
-                                <Info className="w-4 h-4 sm:w-5 sm:h-5 shrink-0" /> <span>{habit.prayer.context}</span>
+                              <div className="mt-3 sm:mt-4 pt-3 sm:pt-4 border-t border-white/30 text-[10px] sm:text-[11px] text-teal-200 uppercase tracking-wider font-black flex items-center gap-2">
+                                <Info className="w-3.5 h-3.5 sm:w-4 sm:h-4 shrink-0" /> <span>{habit.prayer.context}</span>
                               </div>
                             )}
                           </div>
@@ -481,23 +481,23 @@ const App: React.FC = () => {
             ))}
 
             {/* Muhasabah Bisnis - Fixed Contrast */}
-            <SectionHeader title="Muhasabah Bisnis" icon={<Heart className="w-4 h-4 sm:w-5 sm:h-5" />} />
-            <Card className="p-5 sm:p-8 mb-12 sm:mb-16 bg-white border-2 border-slate-300 shadow-2xl">
-              <h3 className="font-black text-lg sm:text-xl mb-6 sm:mb-8 flex items-center gap-2 sm:gap-3 text-teal-950 uppercase tracking-tighter">
-                <Info className="w-5 h-5 sm:w-6 sm:h-6 text-teal-700 shrink-0" /> <span>Refleksi Penutup Hari</span>
+            <SectionHeader title="Muhasabah Bisnis" icon={<Heart className="w-3.5 h-3.5 sm:w-4 sm:h-4" />} />
+            <Card className="p-4 sm:p-5 mb-8 sm:mb-10 bg-white border-2 border-slate-300 shadow-xl">
+              <h3 className="font-black text-base sm:text-lg mb-4 sm:mb-5 flex items-center gap-2 text-teal-950 uppercase tracking-tighter">
+                <Info className="w-4 h-4 sm:w-5 sm:h-5 text-teal-700 shrink-0" /> <span>Refleksi Penutup Hari</span>
               </h3>
-              <div className="space-y-4 sm:space-y-5">
+              <div className="space-y-2.5 sm:space-y-3">
                 {[
                   { key: 'jujur', label: 'Apakah hari ini saya jujur?' },
                   { key: 'followUp', label: 'Ada klien belum ditindaklanjuti?' },
                   { key: 'hakOrang', label: 'Ada hak orang tertunda?' },
                   { key: 'dosaDigital', label: 'Ada dosa digital (manipulasi)?' }
                 ].map(({ key, label }) => (
-                  <label key={key} className="flex items-center justify-between p-4 sm:p-5 rounded-2xl sm:rounded-3xl bg-slate-50 border-2 border-slate-200 cursor-pointer hover:bg-slate-100 active:bg-slate-100 transition-all active:scale-[0.97] group min-h-[60px]">
-                    <span className="text-xs sm:text-sm font-black text-slate-950 tracking-tight group-hover:text-teal-900 pr-2">{label}</span>
+                  <label key={key} className="flex items-center justify-between p-3 sm:p-4 rounded-xl sm:rounded-2xl bg-slate-50 border-2 border-slate-200 cursor-pointer hover:bg-slate-100 active:bg-slate-100 transition-all active:scale-[0.97] group min-h-[50px]">
+                    <span className="text-[11px] sm:text-xs font-black text-slate-950 tracking-tight group-hover:text-teal-900 pr-2">{label}</span>
                     <input 
                       type="checkbox" 
-                      className="w-8 h-8 sm:w-9 sm:h-9 rounded-xl sm:rounded-2xl border-2 border-slate-400 text-teal-800 focus:ring-teal-800 focus:ring-offset-2 shadow-inner transition-colors shrink-0 cursor-pointer"
+                      className="w-7 h-7 sm:w-8 sm:h-8 rounded-lg sm:rounded-xl border-2 border-slate-400 text-teal-800 focus:ring-teal-800 focus:ring-offset-2 shadow-inner transition-colors shrink-0 cursor-pointer"
                       checked={todayProgress.muhasabah[key as keyof DailyProgress['muhasabah']]}
                       onChange={() => toggleMuhasabah(key as keyof DailyProgress['muhasabah'])}
                     />
