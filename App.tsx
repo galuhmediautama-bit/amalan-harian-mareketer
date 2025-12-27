@@ -797,27 +797,46 @@ const App: React.FC = () => {
       </main>
 
       {/* Bottom Nav - Full Width Fixed */}
-      <nav className="fixed bottom-0 left-0 right-0 bg-white border-t-2 border-slate-200 px-4 py-3 flex justify-around items-center z-50 shadow-[0_-4px_20px_rgba(0,0,0,0.1)] safe-area-bottom">
+      <nav className="fixed bottom-0 left-0 right-0 bg-white/95 backdrop-blur-xl border-t-2 border-slate-200/80 px-2 py-3 flex justify-around items-center z-50 shadow-[0_-8px_30px_rgba(0,0,0,0.12)]">
         <button 
           onClick={() => setActiveTab('daily')}
-          className={`flex flex-col items-center gap-1 transition-all active:scale-90 flex-1 justify-center ${activeTab === 'daily' ? 'text-teal-950 scale-105' : 'text-slate-500'}`}
+          className={`flex flex-col items-center gap-1 transition-all active:scale-90 flex-1 justify-center relative ${activeTab === 'daily' ? 'text-teal-950 scale-105' : 'text-slate-500'}`}
         >
-          <CheckCircle className={`w-6 h-6 ${activeTab === 'daily' ? 'fill-teal-100 text-teal-900 stroke-[3px]' : 'text-slate-400 stroke-[2.5px]'}`} />
-          <span className={`text-[10px] font-black uppercase tracking-wider ${activeTab === 'daily' ? 'text-teal-950' : 'text-slate-500'}`}>Harian</span>
+          {activeTab === 'daily' && (
+            <div className="absolute -top-1 left-1/2 transform -translate-x-1/2 w-8 h-1 bg-teal-600 rounded-full"></div>
+          )}
+          <CheckCircle className={`w-5 h-5 transition-all ${activeTab === 'daily' ? 'fill-teal-100 text-teal-900 stroke-[3px] drop-shadow-md' : 'text-slate-400 stroke-[2.5px]'}`} />
+          <span className={`text-[9px] font-black uppercase tracking-wider transition-colors ${activeTab === 'daily' ? 'text-teal-950' : 'text-slate-500'}`}>Harian</span>
         </button>
         <button 
           onClick={() => setActiveTab('stats')}
-          className={`flex flex-col items-center gap-1 transition-all active:scale-90 flex-1 justify-center ${activeTab === 'stats' ? 'text-teal-950 scale-105' : 'text-slate-500'}`}
+          className={`flex flex-col items-center gap-1 transition-all active:scale-90 flex-1 justify-center relative ${activeTab === 'stats' ? 'text-teal-950 scale-105' : 'text-slate-500'}`}
         >
-          <TrendingUp className={`w-6 h-6 ${activeTab === 'stats' ? 'text-teal-900 stroke-[3px]' : 'text-slate-400 stroke-[2.5px]'}`} />
-          <span className={`text-[10px] font-black uppercase tracking-wider ${activeTab === 'stats' ? 'text-teal-950' : 'text-slate-500'}`}>Grafik</span>
+          {activeTab === 'stats' && (
+            <div className="absolute -top-1 left-1/2 transform -translate-x-1/2 w-8 h-1 bg-teal-600 rounded-full"></div>
+          )}
+          <TrendingUp className={`w-5 h-5 transition-all ${activeTab === 'stats' ? 'text-teal-900 stroke-[3px] drop-shadow-md' : 'text-slate-400 stroke-[2.5px]'}`} />
+          <span className={`text-[9px] font-black uppercase tracking-wider transition-colors ${activeTab === 'stats' ? 'text-teal-950' : 'text-slate-500'}`}>Grafik</span>
+        </button>
+        <button 
+          onClick={() => setActiveTab('together')}
+          className={`flex flex-col items-center gap-1 transition-all active:scale-90 flex-1 justify-center relative ${activeTab === 'together' ? 'text-purple-950 scale-105' : 'text-slate-500'}`}
+        >
+          {activeTab === 'together' && (
+            <div className="absolute -top-1 left-1/2 transform -translate-x-1/2 w-8 h-1 bg-purple-600 rounded-full"></div>
+          )}
+          <Users className={`w-5 h-5 transition-all ${activeTab === 'together' ? 'text-purple-900 stroke-[3px] drop-shadow-md' : 'text-slate-400 stroke-[2.5px]'}`} />
+          <span className={`text-[9px] font-black uppercase tracking-wider transition-colors ${activeTab === 'together' ? 'text-purple-950' : 'text-slate-500'}`}>Bersama</span>
         </button>
         <button 
           onClick={() => setActiveTab('emergency')}
-          className={`flex flex-col items-center gap-1 transition-all active:scale-90 flex-1 justify-center ${activeTab === 'emergency' ? 'text-red-900 scale-105' : 'text-slate-500'}`}
+          className={`flex flex-col items-center gap-1 transition-all active:scale-90 flex-1 justify-center relative ${activeTab === 'emergency' ? 'text-red-900 scale-105' : 'text-slate-500'}`}
         >
-          <AlertTriangle className={`w-6 h-6 ${activeTab === 'emergency' ? 'fill-red-50 text-red-900 stroke-[3px]' : 'text-slate-400 stroke-[2.5px]'}`} />
-          <span className={`text-[10px] font-black uppercase tracking-wider ${activeTab === 'emergency' ? 'text-red-950' : 'text-slate-500'}`}>Boncos</span>
+          {activeTab === 'emergency' && (
+            <div className="absolute -top-1 left-1/2 transform -translate-x-1/2 w-8 h-1 bg-red-600 rounded-full"></div>
+          )}
+          <AlertTriangle className={`w-5 h-5 transition-all ${activeTab === 'emergency' ? 'fill-red-50 text-red-900 stroke-[3px] drop-shadow-md' : 'text-slate-400 stroke-[2.5px]'}`} />
+          <span className={`text-[9px] font-black uppercase tracking-wider transition-colors ${activeTab === 'emergency' ? 'text-red-950' : 'text-slate-500'}`}>Boncos</span>
         </button>
       </nav>
     </div>
