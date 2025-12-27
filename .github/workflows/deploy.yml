@@ -58,14 +58,23 @@ jobs:
           echo "✅ Build output verified"
           ls -la dist/
 
+      - name: Setup Google Cloud SDK
+        uses: google-github-actions/setup-gcloud@v1
+        with:
+          service_account_key: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+          project_id: aplikasi-amalan-harian
+
       - name: Setup Firebase CLI
         run: npm install -g firebase-tools
 
+      - name: Authenticate Firebase
+        run: |
+          export FIREBASE_TOKEN=$(gcloud auth print-access-token)
+          echo "FIREBASE_TOKEN=$FIREBASE_TOKEN" >> $GITHUB_ENV
+
       - name: Deploy to Firebase Hosting
         run: |
-          echo "${{ secrets.FIREBASE_SERVICE_ACCOUNT }}" > $HOME/firebase-service-account.json
-          export GOOGLE_APPLICATION_CREDENTIALS="$HOME/firebase-service-account.json"
-          firebase deploy --only hosting --project aplikasi-amalan-harian --non-interactive
+          firebase deploy --only hosting --project aplikasi-amalan-harian --non-interactive --token "$FIREBASE_TOKEN"
         env:
-          GOOGLE_APPLICATION_CREDENTIALS: $HOME/firebase-service-account.json
+          FIREBASE_TOKEN: ${{ env.FIREBASE_TOKEN }}
 
