@@ -257,6 +257,16 @@ const App: React.FC = () => {
     "Barakah menjaga performa jangka panjang"
   ];
 
+  // Rotate prinsip dasar untuk ditampilkan di header
+  const [currentPrinsipIndex, setCurrentPrinsipIndex] = useState(0);
+  
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setCurrentPrinsipIndex((prev) => (prev + 1) % prinsipDasar.length);
+    }, 5000); // Rotate every 5 seconds
+    return () => clearInterval(interval);
+  }, [prinsipDasar.length]);
+
   return (
     <div className="max-w-xl mx-auto min-h-screen pb-24 sm:pb-28">
       {/* Header */}
@@ -301,29 +311,62 @@ const App: React.FC = () => {
               ></div>
             </div>
           </div>
+
+          {/* Prinsip Dasar Rotator */}
+          <div className="mt-6 sm:mt-8 flex items-center gap-3 sm:gap-4 bg-white/10 p-4 sm:p-5 rounded-2xl sm:rounded-3xl border border-white/20 backdrop-blur-sm">
+            <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-gradient-to-br from-yellow-400 to-yellow-500 flex items-center justify-center font-black text-teal-900 text-lg sm:text-xl shadow-lg shrink-0 border-2 border-yellow-300 animate-pulse">
+              {currentPrinsipIndex + 1}
+            </div>
+            <p className="text-[12px] sm:text-[14px] text-white font-black leading-relaxed flex-1 transition-opacity duration-500">
+              {prinsipDasar[currentPrinsipIndex]}
+            </p>
+          </div>
         </div>
       </header>
 
       {/* Navigation Tabs */}
       <div className="px-4 sm:px-5 -mt-6 sm:-mt-8 relative z-20">
-        <div className="bg-white rounded-2xl sm:rounded-3xl shadow-2xl border border-slate-200 p-1.5 sm:p-2 flex gap-1 sm:gap-0">
+        <div className="bg-white rounded-2xl sm:rounded-3xl shadow-2xl border border-slate-200 p-1.5 sm:p-2 flex gap-1 sm:gap-0 relative">
+          {/* Animated background indicator */}
+          <div 
+            className={`absolute top-1.5 sm:top-2 bottom-1.5 sm:bottom-2 rounded-xl sm:rounded-2xl bg-teal-800 transition-all duration-300 ease-out shadow-lg ${
+              activeTab === 'daily' ? 'left-1.5 sm:left-2 w-[calc(33.333%-0.5rem)]' :
+              activeTab === 'stats' ? 'left-[calc(33.333%+0.25rem)] w-[calc(33.333%-0.5rem)]' :
+              'left-[calc(66.666%+0.25rem)] w-[calc(33.333%-0.5rem)]'
+            }`}
+          />
           <button 
             onClick={() => setActiveTab('daily')}
-            className={`flex-1 py-3 sm:py-4 px-2 sm:px-4 rounded-xl sm:rounded-2xl text-[11px] sm:text-[13px] font-black transition-all flex items-center justify-center gap-1 sm:gap-2 min-h-[44px] ${activeTab === 'daily' ? 'bg-teal-800 text-white shadow-xl' : 'text-slate-900 hover:bg-slate-50 active:bg-slate-100'}`}
+            className={`flex-1 py-3 sm:py-4 px-2 sm:px-4 rounded-xl sm:rounded-2xl text-[11px] sm:text-[13px] font-black transition-all duration-300 flex items-center justify-center gap-1 sm:gap-2 min-h-[44px] relative z-10 ${
+              activeTab === 'daily' 
+                ? 'text-white transform scale-105' 
+                : 'text-slate-900 hover:text-teal-800 active:scale-95'
+            }`}
           >
-            <CheckCircle className="w-3.5 h-3.5 sm:w-4 sm:h-4" /> <span className="hidden sm:inline">HARIAN</span><span className="sm:hidden">HARIAN</span>
+            <CheckCircle className={`w-3.5 h-3.5 sm:w-4 sm:h-4 transition-all ${activeTab === 'daily' ? 'scale-110' : ''}`} /> 
+            <span>HARIAN</span>
           </button>
           <button 
             onClick={() => setActiveTab('stats')}
-            className={`flex-1 py-3 sm:py-4 px-2 sm:px-4 rounded-xl sm:rounded-2xl text-[11px] sm:text-[13px] font-black transition-all flex items-center justify-center gap-1 sm:gap-2 min-h-[44px] ${activeTab === 'stats' ? 'bg-teal-800 text-white shadow-xl' : 'text-slate-900 hover:bg-slate-50 active:bg-slate-100'}`}
+            className={`flex-1 py-3 sm:py-4 px-2 sm:px-4 rounded-xl sm:rounded-2xl text-[11px] sm:text-[13px] font-black transition-all duration-300 flex items-center justify-center gap-1 sm:gap-2 min-h-[44px] relative z-10 ${
+              activeTab === 'stats' 
+                ? 'text-white transform scale-105' 
+                : 'text-slate-900 hover:text-teal-800 active:scale-95'
+            }`}
           >
-            <TrendingUp className="w-3.5 h-3.5 sm:w-4 sm:h-4" /> <span className="hidden sm:inline">GRAFIK</span><span className="sm:hidden">GRAFIK</span>
+            <TrendingUp className={`w-3.5 h-3.5 sm:w-4 sm:h-4 transition-all ${activeTab === 'stats' ? 'scale-110' : ''}`} /> 
+            <span>GRAFIK</span>
           </button>
           <button 
             onClick={() => setActiveTab('emergency')}
-            className={`flex-1 py-3 sm:py-4 px-2 sm:px-4 rounded-xl sm:rounded-2xl text-[11px] sm:text-[13px] font-black transition-all flex items-center justify-center gap-1 sm:gap-2 min-h-[44px] ${activeTab === 'emergency' ? 'bg-teal-800 text-white shadow-xl' : 'text-slate-900 hover:bg-slate-50 active:bg-slate-100'}`}
+            className={`flex-1 py-3 sm:py-4 px-2 sm:px-4 rounded-xl sm:rounded-2xl text-[11px] sm:text-[13px] font-black transition-all duration-300 flex items-center justify-center gap-1 sm:gap-2 min-h-[44px] relative z-10 ${
+              activeTab === 'emergency' 
+                ? 'text-white transform scale-105' 
+                : 'text-slate-900 hover:text-red-600 active:scale-95'
+            }`}
           >
-            <AlertTriangle className="w-3.5 h-3.5 sm:w-4 sm:h-4" /> <span className="hidden sm:inline">BONCOS</span><span className="sm:hidden">BONCOS</span>
+            <AlertTriangle className={`w-3.5 h-3.5 sm:w-4 sm:h-4 transition-all ${activeTab === 'emergency' ? 'scale-110' : ''}`} /> 
+            <span>BONCOS</span>
           </button>
         </div>
       </div>
@@ -368,17 +411,17 @@ const App: React.FC = () => {
                 />
                 <div className="space-y-3 sm:space-y-4">
                   {habits.map(habit => (
-                    <Card key={habit.id} className={`transition-all ${todayProgress.completedHabitIds.includes(habit.id) ? 'bg-slate-100 border-slate-300 opacity-80 shadow-none' : 'bg-white border-slate-200 shadow-lg'}`}>
+                    <Card key={habit.id} className={`transition-all duration-300 ${todayProgress.completedHabitIds.includes(habit.id) ? 'bg-slate-100 border-slate-300 opacity-80 shadow-none' : 'bg-white border-slate-200 shadow-lg hover:shadow-xl hover:border-teal-300'}`}>
                       <div className="p-4 sm:p-5">
                         <div className="flex items-center gap-3 sm:gap-5">
                           <button 
                             onClick={() => toggleHabit(habit.id)}
-                            className="shrink-0 transition-transform active:scale-75 min-w-[44px] min-h-[44px] flex items-center justify-center"
+                            className="shrink-0 transition-all duration-200 active:scale-75 min-w-[44px] min-h-[44px] flex items-center justify-center hover:scale-110"
                           >
                             {todayProgress.completedHabitIds.includes(habit.id) ? (
-                              <CheckCircle className="w-10 h-10 sm:w-11 sm:h-11 text-teal-800 fill-teal-50" />
+                              <CheckCircle className="w-10 h-10 sm:w-11 sm:h-11 text-teal-800 fill-teal-50 animate-in fade-in zoom-in duration-200" />
                             ) : (
-                              <Circle className="w-10 h-10 sm:w-11 sm:h-11 text-slate-400 stroke-[2.5px]" />
+                              <Circle className="w-10 h-10 sm:w-11 sm:h-11 text-slate-400 stroke-[2.5px] hover:text-teal-600 transition-colors" />
                             )}
                           </button>
                           <div className="flex-1 cursor-pointer min-w-0" onClick={() => setExpandedHabitId(expandedHabitId === habit.id ? null : habit.id)}>
