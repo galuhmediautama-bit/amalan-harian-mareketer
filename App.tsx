@@ -249,54 +249,59 @@ const App: React.FC = () => {
   return (
     <div className="max-w-xl mx-auto min-h-screen pb-16">
       {/* Header */}
-      <header className="bg-teal-900 text-white pt-3 sm:pt-4 pb-4 sm:pb-5 px-4 sm:px-6 rounded-b-xl sm:rounded-b-2xl shadow-xl relative overflow-hidden">
-        <div className="absolute top-0 right-0 w-24 h-24 sm:w-40 sm:h-40 bg-teal-800 rounded-full -mr-10 sm:-mr-16 -mt-10 sm:-mt-16 opacity-30 blur-3xl"></div>
+      <header className="bg-gradient-to-br from-teal-900 via-teal-800 to-teal-900 text-white pt-4 pb-5 px-4 rounded-b-2xl shadow-2xl relative overflow-hidden">
+        {/* Decorative elements */}
+        <div className="absolute top-0 right-0 w-40 h-40 bg-teal-700 rounded-full -mr-12 -mt-12 opacity-40 blur-3xl"></div>
+        <div className="absolute bottom-0 left-0 w-32 h-32 bg-teal-600 rounded-full -ml-8 -mb-8 opacity-30 blur-3xl"></div>
         <div className="relative z-10">
-          <div className="flex justify-between items-start mb-2 sm:mb-3">
+          <div className="flex justify-between items-start mb-3">
             <div className="flex-1 pr-2">
-              <h1 className="text-lg sm:text-xl font-black tracking-tighter leading-tight">Marketer Berkah</h1>
-              <p className="text-teal-300 text-[8px] sm:text-[9px] font-black uppercase tracking-wider mt-0.5 leading-tight">
+              <h1 className="text-lg font-black tracking-tighter leading-tight drop-shadow-lg">Marketer Berkah</h1>
+              <p className="text-teal-200 text-[10px] font-black uppercase tracking-wider mt-0.5 leading-tight opacity-90">
                 Traffic berkah • Conversion stabil • Cashflow sehat
               </p>
             </div>
-            <div className="flex items-center gap-1 sm:gap-1.5">
-              <div className="bg-teal-800 p-1.5 sm:p-2 rounded-lg border border-teal-600 shadow-md shrink-0">
-                <Calendar className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-white" />
+            <div className="flex items-center gap-1.5">
+              <div className="bg-white/10 backdrop-blur-sm p-2 rounded-lg border border-white/20 shadow-lg shrink-0 hover:bg-white/20 transition-colors">
+                <Calendar className="w-4 h-4 text-white" />
               </div>
               <button
                 onClick={handleLogout}
-                className="bg-teal-800/80 hover:bg-teal-800 p-1.5 sm:p-2 rounded-lg border border-teal-600 shadow-md shrink-0 transition-colors"
+                className="bg-white/10 backdrop-blur-sm hover:bg-white/20 p-2 rounded-lg border border-white/20 shadow-lg shrink-0 transition-all active:scale-95"
                 title="Logout"
               >
-                <LogOut className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-white" />
+                <LogOut className="w-4 h-4 text-white" />
               </button>
               {isSaving && (
-                <div className="text-[9px] sm:text-[10px] text-teal-300 font-black animate-pulse">
+                <div className="text-[10px] text-teal-200 font-black animate-pulse flex items-center gap-1">
+                  <div className="w-1.5 h-1.5 bg-teal-300 rounded-full animate-pulse"></div>
                   Saving...
                 </div>
               )}
             </div>
           </div>
 
-          <div className="bg-white/10 p-2 sm:p-3 rounded-lg sm:rounded-xl border border-white/20 mt-2.5 sm:mt-3 shadow-inner backdrop-blur-sm">
-            <div className="flex justify-between items-end mb-1">
-              <span className="text-[8px] sm:text-[9px] font-black text-white uppercase tracking-[0.1em]">Progress Hari Ini</span>
-              <span className="text-xl sm:text-2xl font-black">{completionPercentage}%</span>
+          <div className="bg-white/15 backdrop-blur-md p-3 rounded-xl border border-white/30 mt-3 shadow-xl">
+            <div className="flex justify-between items-end mb-1.5">
+              <span className="text-[10px] font-black text-white uppercase tracking-wider opacity-90">Progress Hari Ini</span>
+              <span className="text-2xl font-black drop-shadow-lg">{completionPercentage}%</span>
             </div>
-            <div className="h-2.5 sm:h-3 w-full bg-teal-950/60 rounded-full overflow-hidden border border-white/10">
+            <div className="h-3 w-full bg-teal-950/70 rounded-full overflow-hidden border border-white/20 shadow-inner">
               <div 
-                className="h-full bg-gradient-to-r from-teal-500 to-teal-200 rounded-full transition-all duration-1000 ease-out shadow-[0_0_8px_rgba(45,212,191,0.5)]" 
+                className="h-full bg-gradient-to-r from-teal-400 via-teal-300 to-teal-200 rounded-full transition-all duration-1000 ease-out shadow-[0_0_12px_rgba(45,212,191,0.6)] relative overflow-hidden" 
                 style={{ width: `${completionPercentage}%` }}
-              ></div>
+              >
+                <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent animate-shimmer"></div>
+              </div>
             </div>
           </div>
 
-          {/* Prinsip Dasar Rotator - Compact */}
-          <div className="mt-2.5 sm:mt-3 flex items-center gap-1.5 sm:gap-2 bg-white/10 p-2 sm:p-2.5 rounded-lg sm:rounded-xl border border-white/20 backdrop-blur-sm">
-            <div className="w-6 h-6 sm:w-7 sm:h-7 rounded-full bg-gradient-to-br from-yellow-400 to-yellow-500 flex items-center justify-center font-black text-teal-900 text-xs sm:text-sm shadow-md shrink-0 border border-yellow-300">
+          {/* Prinsip Dasar Rotator */}
+          <div className="mt-4 flex items-center gap-2 bg-white/15 backdrop-blur-md p-2.5 rounded-xl border border-white/30 shadow-lg">
+            <div className="w-7 h-7 rounded-full bg-gradient-to-br from-yellow-400 via-yellow-500 to-amber-500 flex items-center justify-center font-black text-teal-900 text-xs shadow-xl shrink-0 border-2 border-yellow-300/80 ring-2 ring-yellow-200/50">
               {currentPrinsipIndex + 1}
             </div>
-            <p className="text-[10px] sm:text-[11px] text-white font-black leading-tight flex-1 transition-opacity duration-500 line-clamp-1">
+            <p className="text-[11px] text-white font-black leading-snug flex-1 transition-opacity duration-500 drop-shadow-sm">
               {prinsipDasar[currentPrinsipIndex]}
             </p>
           </div>
