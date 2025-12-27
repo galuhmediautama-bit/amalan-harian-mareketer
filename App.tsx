@@ -266,16 +266,9 @@ const App: React.FC = () => {
               </p>
             </div>
             <div className="flex items-center gap-1.5">
-              <div className="bg-white/10 backdrop-blur-sm p-2 rounded-lg border border-white/20 shadow-lg shrink-0 hover:bg-white/20 transition-colors">
+              <div className="bg-white/10 backdrop-blur-sm p-2 rounded-lg border border-white/20 shadow-lg shrink-0 hover:bg-white/20 transition-colors" title="Kalender">
                 <Calendar className="w-4 h-4 text-white" />
               </div>
-              <button
-                onClick={handleLogout}
-                className="bg-white/10 backdrop-blur-sm hover:bg-white/20 p-2 rounded-lg border border-white/20 shadow-lg shrink-0 transition-all active:scale-95"
-                title="Logout"
-              >
-                <LogOut className="w-4 h-4 text-white" />
-              </button>
               {isSaving && (
                 <div className="text-[10px] text-teal-200 font-black animate-pulse flex items-center gap-1">
                   <div className="w-1.5 h-1.5 bg-teal-300 rounded-full animate-pulse"></div>
@@ -733,6 +726,21 @@ const App: React.FC = () => {
                   </div>
                 ))}
               </div>
+            </Card>
+
+            {/* Settings Section */}
+            <Card className="p-4 bg-white border-2 border-slate-200 shadow-lg">
+              <h3 className="font-black text-sm mb-3 flex items-center gap-2 text-slate-950 uppercase tracking-tight">
+                <Info className="w-4 h-4 text-slate-600" />
+                <span>Pengaturan</span>
+              </h3>
+              <button
+                onClick={handleLogout}
+                className="w-full flex items-center justify-center gap-2 p-3 rounded-xl bg-gradient-to-r from-red-50 to-red-100/50 border-2 border-red-300 text-red-900 font-black text-sm uppercase tracking-tight hover:from-red-100 hover:to-red-200 active:scale-95 transition-all shadow-sm hover:shadow-md"
+              >
+                <LogOut className="w-4 h-4" />
+                <span>Keluar / Logout</span>
+              </button>
             </Card>
           </div>
         )}
