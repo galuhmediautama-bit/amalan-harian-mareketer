@@ -71,6 +71,15 @@ const App: React.FC = () => {
   const [expandedHabitId, setExpandedHabitId] = useState<string | null>(null);
   const [isSaving, setIsSaving] = useState(false);
   const [currentPrinsipIndex, setCurrentPrinsipIndex] = useState(0);
+  
+  // Partnership state
+  const [partnership, setPartnership] = useState<Partnership | null>(null);
+  const [pendingInvitations, setPendingInvitations] = useState<{ sent: Partnership[]; received: Partnership[] }>({ sent: [], received: [] });
+  const [partnerProgress, setPartnerProgress] = useState<AppState | null>(null);
+  const [messages, setMessages] = useState<Message[]>([]);
+  const [newMessage, setNewMessage] = useState('');
+  const [inviteEmail, setInviteEmail] = useState('');
+  const [showInviteModal, setShowInviteModal] = useState(false);
 
   // Check authentication and load data
   useEffect(() => {
@@ -128,6 +137,86 @@ const App: React.FC = () => {
 
     return () => clearTimeout(timeoutId);
   }, [state, user]);
+
+  // Load partnership data
+  useEffect(() => {
+    if (!user) {
+      setPartnership(null);
+      setPendingInvitations({ sent: [], received: [] });
+      setPartnerProgress(null);
+      setMessages([]);
+      return;
+    }
+
+    const loadPartnershipData = async () => {
+      try {
+        const [myPartnership, invitations] = await Promise.all([
+          getMyPartnership(),
+          getPendingInvitations()
+        ]);
+        setPartnership(myPartnership);
+        setPendingInvitations(invitations);
+
+        // Load partner progress if partnership exists
+        if (myPartnership) {
+          const partnerId = myPartnership.user1_id === user.id ? myPartnership.user2_id : myPartnership.user1_id;
+          const progress = await getPartnerProgress(partnerId);
+          setPartnerProgress(progress);
+        } else {
+          setPartnerProgress(null);
+        }
+      } catch (error) {
+        console.error('Error loading partnership data:', error);
+      }
+    };
+
+    loadPartnershipData();
+
+    // Subscribe to partnership changes
+    const unsubscribe = subscribeToPartnership((updatedPartnership) => {
+      setPartnership(updatedPartnership);
+      if (updatedPartnership && user) {
+        const partnerId = updatedPartnership.user1_id === user.id ? updatedPartnership.user2_id : updatedPartnership.user1_id;
+        getPartnerProgress(partnerId).then(setPartnerProgress);
+      } else {
+        setPartnerProgress(null);
+      }
+    });
+
+    return () => {
+      unsubscribe();
+    };
+  }, [user]);
+
+  // Load messages when partnership exists
+  useEffect(() => {
+    if (!user || !partnership) {
+      setMessages([]);
+      return;
+    }
+
+    const partnerId = partnership.user1_id === user.id ? partnership.user2_id : partnership.user1_id;
+    
+    const loadMessages = async () => {
+      try {
+        const msgs = await getMessages(partnerId);
+        setMessages(msgs);
+      } catch (error) {
+        console.error('Error loading messages:', error);
+      }
+    };
+
+    loadMessages();
+
+    // Subscribe to message changes
+    const unsubscribe = subscribeToMessages(partnerId, (updatedMessages) => {
+      setMessages(updatedMessages);
+    });
+
+    return () => {
+      unsubscribe();
+    };
+  }, [user, partnership]);
 
   // All hooks must be called before early returns
   const today = state.currentDate;
@@ -599,43 +688,160 @@ const App: React.FC = () => {
                 <span>Partner Saya</span>
               </h3>
               <div className="space-y-3">
-                {/* No Partner State */}
-                <div className="p-4 rounded-xl bg-slate-50 border-2 border-dashed border-slate-300 text-center">
-                  <Users className="w-8 h-8 text-slate-400 mx-auto mb-2" />
-                  <p className="text-xs font-black text-slate-600 mb-3">Belum ada partner</p>
-                  <button className="px-4 py-2 bg-gradient-to-r from-purple-600 to-purple-500 text-white text-xs font-black rounded-lg shadow-lg hover:shadow-xl transition-all active:scale-95">
-                    + Invite Partner
-                  </button>
-                </div>
-
-                {/* Partner Card (Example - akan diimplementasi dengan data real) */}
-                {/* <div className="p-3 rounded-xl bg-gradient-to-r from-teal-50 to-teal-100/50 border-2 border-teal-300">
-                  <div className="flex items-center justify-between mb-2">
-                    <div className="flex items-center gap-2">
-                      <div className="w-10 h-10 rounded-full bg-teal-600 flex items-center justify-center text-white font-black text-sm">
-                        JD
-                      </div>
-                      <div>
-                        <p className="text-sm font-black text-slate-950">John Doe</p>
-                        <p className="text-[10px] text-slate-600">Partner sejak 15 Des 2024</p>
-                      </div>
-                    </div>
-                    <button className="p-2 rounded-lg bg-slate-100 hover:bg-slate-200 transition-colors">
-                      <MessageCircle className="w-4 h-4 text-slate-600" />
+                {!partnership && pendingInvitations.received.length === 0 && pendingInvitations.sent.length === 0 && (
+                  <div className="p-4 rounded-xl bg-slate-50 border-2 border-dashed border-slate-300 text-center">
+                    <Users className="w-8 h-8 text-slate-400 mx-auto mb-2" />
+                    <p className="text-xs font-black text-slate-600 mb-3">Belum ada partner</p>
+                    <button 
+                      onClick={() => setShowInviteModal(true)}
+                      className="px-4 py-2 bg-gradient-to-r from-purple-600 to-purple-500 text-white text-xs font-black rounded-lg shadow-lg hover:shadow-xl transition-all active:scale-95"
+                    >
+                      + Invite Partner
                     </button>
                   </div>
-                  <div className="flex items-center gap-4 text-xs">
-                    <div>
-                      <p className="text-slate-500 font-black">Progress Hari Ini</p>
-                      <p className="text-teal-900 font-black text-sm">75%</p>
-                    </div>
-                    <div>
-                      <p className="text-slate-500 font-black">Streak</p>
-                      <p className="text-teal-900 font-black text-sm">12 hari</p>
-                    </div>
+                )}
+
+                {/* Pending Invitations Received */}
+                {pendingInvitations.received.length > 0 && (
+                  <div className="space-y-2">
+                    <p className="text-xs font-black text-slate-600 mb-2">Undangan Masuk:</p>
+                    {pendingInvitations.received.map((inv) => (
+                      <div key={inv.id} className="p-3 rounded-xl bg-amber-50 border-2 border-amber-300">
+                        <p className="text-xs font-black text-amber-950 mb-2">Undangan dari partner</p>
+                        <div className="flex gap-2">
+                          <button
+                            onClick={async () => {
+                              try {
+                                await acceptPartnership(inv.id);
+                                const [updatedPartnership, updatedInvitations] = await Promise.all([
+                                  getMyPartnership(),
+                                  getPendingInvitations()
+                                ]);
+                                setPartnership(updatedPartnership);
+                                setPendingInvitations(updatedInvitations);
+                              } catch (error: any) {
+                                alert(error.message || 'Error accepting partnership');
+                              }
+                            }}
+                            className="flex-1 px-3 py-1.5 bg-green-600 text-white text-xs font-black rounded-lg hover:bg-green-700 active:scale-95 transition-all"
+                          >
+                            Terima
+                          </button>
+                          <button
+                            onClick={async () => {
+                              try {
+                                await rejectPartnership(inv.id);
+                                const updatedInvitations = await getPendingInvitations();
+                                setPendingInvitations(updatedInvitations);
+                              } catch (error: any) {
+                                alert(error.message || 'Error rejecting partnership');
+                              }
+                            }}
+                            className="flex-1 px-3 py-1.5 bg-red-600 text-white text-xs font-black rounded-lg hover:bg-red-700 active:scale-95 transition-all"
+                          >
+                            Tolak
+                          </button>
+                        </div>
+                      </div>
+                    ))}
                   </div>
-                </div> */}
+                )}
+
+                {/* Pending Invitations Sent */}
+                {pendingInvitations.sent.length > 0 && (
+                  <div className="p-3 rounded-xl bg-blue-50 border-2 border-blue-300">
+                    <p className="text-xs font-black text-blue-950">Menunggu konfirmasi partner...</p>
+                  </div>
+                )}
+
+                {/* Active Partnership */}
+                {partnership && (
+                  <div className="p-3 rounded-xl bg-gradient-to-r from-teal-50 to-teal-100/50 border-2 border-teal-300">
+                    <div className="flex items-center justify-between mb-2">
+                      <div className="flex items-center gap-2">
+                        <div className="w-10 h-10 rounded-full bg-teal-600 flex items-center justify-center text-white font-black text-sm">
+                          {partnership.partner?.name?.charAt(0)?.toUpperCase() || 'P'}
+                        </div>
+                        <div>
+                          <p className="text-sm font-black text-slate-950">Partner Aktif</p>
+                          <p className="text-[10px] text-slate-600">
+                            Sejak {new Date(partnership.created_at).toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' })}
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+                    {partnerProgress && (
+                      <div className="flex items-center gap-4 text-xs mt-2">
+                        <div>
+                          <p className="text-slate-500 font-black">Progress Hari Ini</p>
+                          <p className="text-teal-900 font-black text-sm">
+                            {(() => {
+                              const today = new Date().toISOString().split('T')[0];
+                              const todayProg = partnerProgress.progress[today];
+                              if (!todayProg || !todayProg.completedHabitIds) return '0%';
+                              const partnerPoints = HABITS
+                                .filter(h => todayProg.completedHabitIds.includes(h.id))
+                                .reduce((sum, h) => sum + h.points, 0);
+                              return Math.round((partnerPoints / totalPointsPossible) * 100) + '%';
+                            })()}
+                          </p>
+                        </div>
+                        <div>
+                          <p className="text-slate-500 font-black">Total Hari</p>
+                          <p className="text-teal-900 font-black text-sm">{Object.keys(partnerProgress.progress || {}).length}</p>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                )}
               </div>
+            </Card>
+
+            {/* Invite Modal */}
+            {showInviteModal && (
+              <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+                <Card className="p-4 bg-white max-w-md w-full">
+                  <h3 className="font-black text-base mb-3 text-slate-950">Invite Partner</h3>
+                  <p className="text-xs text-slate-600 mb-3">
+                    Masukkan User ID partner untuk mengundang. (Untuk testing - nanti bisa diganti dengan email)
+                  </p>
+                  <input
+                    type="text"
+                    value={inviteEmail}
+                    onChange={(e) => setInviteEmail(e.target.value)}
+                    placeholder="User ID partner (UUID)"
+                    className="w-full px-3 py-2 rounded-lg border-2 border-slate-300 text-sm font-black mb-3"
+                  />
+                  <div className="flex gap-2">
+                    <button
+                      onClick={async () => {
+                        try {
+                          await invitePartnerById(inviteEmail);
+                          setShowInviteModal(false);
+                          setInviteEmail('');
+                          const updatedInvitations = await getPendingInvitations();
+                          setPendingInvitations(updatedInvitations);
+                        } catch (error: any) {
+                          alert(error.message || 'Error inviting partner');
+                        }
+                      }}
+                      className="flex-1 px-4 py-2 bg-purple-600 text-white text-sm font-black rounded-lg hover:bg-purple-700 active:scale-95 transition-all"
+                    >
+                      Kirim Undangan
+                    </button>
+                    <button
+                      onClick={() => {
+                        setShowInviteModal(false);
+                        setInviteEmail('');
+                      }}
+                      className="px-4 py-2 bg-slate-200 text-slate-700 text-sm font-black rounded-lg hover:bg-slate-300 active:scale-95 transition-all"
+                    >
+                      Batal
+                    </button>
+                  </div>
+                </Card>
+              </div>
+            )}
             </Card>
 
             {/* Comparison View */}
@@ -655,12 +861,35 @@ const App: React.FC = () => {
                       </div>
                       <span className="text-xs font-black text-slate-950 w-12 text-right">{completionPercentage}%</span>
                     </div>
-                    <div className="flex items-center justify-between opacity-50">
+                    <div className={`flex items-center justify-between ${!partnerProgress ? 'opacity-50' : ''}`}>
                       <span className="text-xs font-black text-slate-700">Partner</span>
                       <div className="flex-1 mx-3 h-3 bg-slate-200 rounded-full overflow-hidden">
-                        <div className="h-full bg-gradient-to-r from-purple-500 to-purple-400 rounded-full" style={{ width: '0%' }}></div>
+                        <div 
+                          className="h-full bg-gradient-to-r from-purple-500 to-purple-400 rounded-full" 
+                          style={{ 
+                            width: partnerProgress ? (() => {
+                              const today = new Date().toISOString().split('T')[0];
+                              const todayProg = partnerProgress.progress[today];
+                              if (!todayProg || !todayProg.completedHabitIds) return '0%';
+                              const partnerPoints = HABITS
+                                .filter(h => todayProg.completedHabitIds.includes(h.id))
+                                .reduce((sum, h) => sum + h.points, 0);
+                              return Math.round((partnerPoints / totalPointsPossible) * 100) + '%';
+                            })() : '0%'
+                          }}
+                        ></div>
                       </div>
-                      <span className="text-xs font-black text-slate-950 w-12 text-right">-</span>
+                      <span className="text-xs font-black text-slate-950 w-12 text-right">
+                        {partnerProgress ? (() => {
+                          const today = new Date().toISOString().split('T')[0];
+                          const todayProg = partnerProgress.progress[today];
+                          if (!todayProg || !todayProg.completedHabitIds) return '0%';
+                          const partnerPoints = HABITS
+                            .filter(h => todayProg.completedHabitIds.includes(h.id))
+                            .reduce((sum, h) => sum + h.points, 0);
+                          return Math.round((partnerPoints / totalPointsPossible) * 100) + '%';
+                        })() : '-'}
+                      </span>
                     </div>
                   </div>
                 </div>
@@ -677,12 +906,41 @@ const App: React.FC = () => {
                         {Math.round(statsData.reduce((acc, curr) => acc + curr.points, 0) / (statsData.length || 1) / totalPointsPossible * 100)}%
                       </span>
                     </div>
-                    <div className="flex items-center justify-between opacity-50">
+                    <div className={`flex items-center justify-between ${!partnerProgress ? 'opacity-50' : ''}`}>
                       <span className="text-xs font-black text-slate-700">Partner</span>
                       <div className="flex-1 mx-3 h-3 bg-slate-200 rounded-full overflow-hidden">
-                        <div className="h-full bg-gradient-to-r from-purple-500 to-purple-400 rounded-full" style={{ width: '0%' }}></div>
+                        <div 
+                          className="h-full bg-gradient-to-r from-purple-500 to-purple-400 rounded-full" 
+                          style={{ 
+                            width: partnerProgress ? (() => {
+                              const partnerStats = Object.values(partnerProgress.progress || {});
+                              if (partnerStats.length === 0) return '0%';
+                              const avgPoints = partnerStats.reduce((sum: number, prog: any) => {
+                                if (!prog.completedHabitIds) return sum;
+                                const points = HABITS
+                                  .filter(h => prog.completedHabitIds.includes(h.id))
+                                  .reduce((s, h) => s + h.points, 0);
+                                return sum + points;
+                              }, 0) / partnerStats.length;
+                              return Math.round((avgPoints / totalPointsPossible) * 100) + '%';
+                            })() : '0%'
+                          }}
+                        ></div>
                       </div>
-                      <span className="text-xs font-black text-slate-950 w-12 text-right">-</span>
+                      <span className="text-xs font-black text-slate-950 w-12 text-right">
+                        {partnerProgress ? (() => {
+                          const partnerStats = Object.values(partnerProgress.progress || {});
+                          if (partnerStats.length === 0) return '0%';
+                          const avgPoints = partnerStats.reduce((sum: number, prog: any) => {
+                            if (!prog.completedHabitIds) return sum;
+                            const points = HABITS
+                              .filter(h => prog.completedHabitIds.includes(h.id))
+                              .reduce((s, h) => s + h.points, 0);
+                            return sum + points;
+                          }, 0) / partnerStats.length;
+                          return Math.round((avgPoints / totalPointsPossible) * 100) + '%';
+                        })() : '-'}
+                      </span>
                     </div>
                   </div>
                 </div>
