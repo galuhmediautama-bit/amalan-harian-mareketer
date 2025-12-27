@@ -20,14 +20,33 @@ const Login: React.FC<LoginProps> = ({ onLoginSuccess }) => {
     setLoading(true);
 
     try {
+      let user;
       if (isSignUp) {
-        await signUp(email, password, name);
+        console.log('Attempting sign up...');
+        user = await signUp(email, password, name);
+        console.log('Sign up result:', user);
       } else {
-        await signIn(email, password);
+        console.log('Attempting sign in...');
+        user = await signIn(email, password);
+        console.log('Sign in result:', user);
       }
-      // onAuthChange will automatically update the user state and redirect
+      
+      if (user) {
+        console.log('Auth successful, waiting for state update...');
+        // Wait a bit for auth state to propagate via onAuthChange
+        setTimeout(() => {
+          setLoading(false);
+          console.log('Loading state reset');
+        }, 1000);
+      } else {
+        console.warn('No user returned from auth');
+        setError('Gagal autentikasi. Silakan coba lagi.');
+        setLoading(false);
+      }
     } catch (err: any) {
-      setError(err.message || 'Terjadi kesalahan');
+      console.error('Auth error:', err);
+      const errorMessage = err.message || err.toString() || 'Terjadi kesalahan';
+      setError(errorMessage);
       setLoading(false);
     }
   };

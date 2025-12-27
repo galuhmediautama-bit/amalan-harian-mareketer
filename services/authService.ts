@@ -31,18 +31,33 @@ export const signUp = async (email: string, password: string, name?: string) => 
       password,
       options: {
         data: {
-          name: name || ''
-        }
+          name: name || '',
+          display_name: name || ''
+        },
+        emailRedirectTo: window.location.origin
       }
     });
     
     if (error) throw error;
     
+    // If user needs email confirmation, they might be null
+    if (!data.user) {
+      throw new Error('Sign up successful but user confirmation may be required. Please check your email.');
+    }
+    
     // Update user metadata if name provided
     if (name && data.user) {
-      await supabase.auth.updateUser({
-        data: { name }
-      });
+      try {
+        await supabase.auth.updateUser({
+          data: { 
+            name,
+            display_name: name
+          }
+        });
+      } catch (updateError) {
+        console.warn('Could not update user metadata:', updateError);
+        // Don't throw, this is not critical
+      }
     }
     
     return data.user;
