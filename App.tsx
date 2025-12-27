@@ -26,6 +26,8 @@ import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContai
 import Login from './components/Login';
 import { onAuthChange, signOutUser, getCurrentUser } from './services/authService';
 import { getUserData, saveUserData, subscribeToUserData, migrateFromLocalStorage } from './services/supabaseService';
+import { getMyPartnership, getPendingInvitations, invitePartnerById, acceptPartnership, rejectPartnership, getPartnerProgress, subscribeToPartnership, Partnership } from './services/partnershipService';
+import { getMessages, sendMessage, subscribeToMessages, Message } from './services/messageService';
 
 // Helper components
 const Card: React.FC<{ children: React.ReactNode, className?: string }> = ({ children, className = "" }) => (
@@ -694,11 +696,80 @@ const App: React.FC = () => {
                 <span>Pesan & Motivasi</span>
               </h3>
               <div className="space-y-3">
-                <div className="p-4 rounded-xl bg-slate-50 border-2 border-dashed border-slate-300 text-center">
-                  <MessageCircle className="w-8 h-8 text-slate-400 mx-auto mb-2" />
-                  <p className="text-xs font-black text-slate-600 mb-3">Belum ada partner untuk saling memberikan motivasi</p>
-                  <p className="text-[10px] text-slate-500">Invite partner untuk mulai saling memberikan feedback</p>
-                </div>
+                {!partnership ? (
+                  <div className="p-4 rounded-xl bg-slate-50 border-2 border-dashed border-slate-300 text-center">
+                    <MessageCircle className="w-8 h-8 text-slate-400 mx-auto mb-2" />
+                    <p className="text-xs font-black text-slate-600 mb-3">Belum ada partner untuk saling memberikan motivasi</p>
+                    <p className="text-[10px] text-slate-500">Invite partner untuk mulai saling memberikan feedback</p>
+                  </div>
+                ) : (
+                  <>
+                    <div className="max-h-48 overflow-y-auto space-y-2 mb-3">
+                      {messages.length === 0 ? (
+                        <p className="text-xs text-slate-500 text-center py-4">Belum ada pesan</p>
+                      ) : (
+                        messages.map((msg) => {
+                          const isMe = msg.sender_id === user?.id;
+                          return (
+                            <div
+                              key={msg.id}
+                              className={`flex ${isMe ? 'justify-end' : 'justify-start'}`}
+                            >
+                              <div
+                                className={`max-w-[80%] p-2.5 rounded-lg ${
+                                  isMe
+                                    ? 'bg-teal-600 text-white'
+                                    : 'bg-slate-100 text-slate-900'
+                                }`}
+                              >
+                                <p className="text-xs leading-relaxed">{msg.message}</p>
+                                <p className={`text-[10px] mt-1 ${isMe ? 'text-teal-100' : 'text-slate-500'}`}>
+                                  {new Date(msg.created_at).toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' })}
+                                </p>
+                              </div>
+                            </div>
+                          );
+                        })
+                      )}
+                    </div>
+                    <div className="flex gap-2">
+                      <input
+                        type="text"
+                        value={newMessage}
+                        onChange={(e) => setNewMessage(e.target.value)}
+                        onKeyPress={(e) => {
+                          if (e.key === 'Enter' && newMessage.trim() && partnership) {
+                            const partnerId = partnership.user1_id === user?.id ? partnership.user2_id : partnership.user1_id;
+                            sendMessage(partnerId, newMessage).then(() => {
+                              setNewMessage('');
+                              getMessages(partnerId).then(setMessages);
+                            }).catch(alert);
+                          }
+                        }}
+                        placeholder="Tulis pesan motivasi..."
+                        className="flex-1 px-3 py-2 rounded-lg border-2 border-slate-300 text-xs font-black"
+                      />
+                      <button
+                        onClick={async () => {
+                          if (!newMessage.trim() || !partnership) return;
+                          const partnerId = partnership.user1_id === user?.id ? partnership.user2_id : partnership.user1_id;
+                          try {
+                            await sendMessage(partnerId, newMessage);
+                            setNewMessage('');
+                            const updatedMessages = await getMessages(partnerId);
+                            setMessages(updatedMessages);
+                          } catch (error: any) {
+                            alert(error.message || 'Error sending message');
+                          }
+                        }}
+                        disabled={!newMessage.trim()}
+                        className="px-4 py-2 bg-teal-600 text-white text-xs font-black rounded-lg hover:bg-teal-700 active:scale-95 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                      >
+                        Kirim
+                      </button>
+                    </div>
+                  </>
+                )}
               </div>
             </Card>
 
