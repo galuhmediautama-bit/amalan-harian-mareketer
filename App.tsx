@@ -247,7 +247,7 @@ const App: React.FC = () => {
   }
 
   return (
-    <div className="max-w-xl mx-auto min-h-screen pb-20 sm:pb-24">
+    <div className="max-w-xl mx-auto min-h-screen pb-16 sm:pb-20">
       {/* Header */}
       <header className="bg-teal-900 text-white pt-3 sm:pt-4 pb-4 sm:pb-5 px-4 sm:px-6 rounded-b-xl sm:rounded-b-2xl shadow-xl relative overflow-hidden">
         <div className="absolute top-0 right-0 w-24 h-24 sm:w-40 sm:h-40 bg-teal-800 rounded-full -mr-10 sm:-mr-16 -mt-10 sm:-mt-16 opacity-30 blur-3xl"></div>
@@ -623,25 +623,25 @@ const App: React.FC = () => {
         )}
       </main>
 
-      {/* Floating Bottom Nav */}
-      <nav className="fixed bottom-4 sm:bottom-6 left-1/2 transform -translate-x-1/2 bg-white border-2 border-slate-200 px-4 sm:px-6 py-3 sm:py-4 flex justify-around items-center z-50 max-w-xs sm:max-w-sm w-[calc(100%-2rem)] shadow-2xl rounded-2xl sm:rounded-3xl">
+      {/* Bottom Nav - Full Width Fixed */}
+      <nav className="fixed bottom-0 left-0 right-0 bg-white border-t-2 border-slate-200 px-4 sm:px-6 py-3 sm:py-4 flex justify-around items-center z-50 shadow-[0_-4px_20px_rgba(0,0,0,0.1)]">
         <button 
           onClick={() => setActiveTab('daily')}
-          className={`flex flex-col items-center gap-1 sm:gap-1.5 transition-all active:scale-90 min-w-[60px] sm:min-w-[70px] justify-center ${activeTab === 'daily' ? 'text-teal-950 scale-105' : 'text-slate-500'}`}
+          className={`flex flex-col items-center gap-1 sm:gap-1.5 transition-all active:scale-90 flex-1 justify-center ${activeTab === 'daily' ? 'text-teal-950 scale-105' : 'text-slate-500'}`}
         >
           <CheckCircle className={`w-6 h-6 sm:w-7 sm:h-7 ${activeTab === 'daily' ? 'fill-teal-100 text-teal-900 stroke-[3px]' : 'text-slate-400 stroke-[2.5px]'}`} />
           <span className={`text-[10px] sm:text-[11px] font-black uppercase tracking-wider ${activeTab === 'daily' ? 'text-teal-950' : 'text-slate-500'}`}>Harian</span>
         </button>
         <button 
           onClick={() => setActiveTab('stats')}
-          className={`flex flex-col items-center gap-1 sm:gap-1.5 transition-all active:scale-90 min-w-[60px] sm:min-w-[70px] justify-center ${activeTab === 'stats' ? 'text-teal-950 scale-105' : 'text-slate-500'}`}
+          className={`flex flex-col items-center gap-1 sm:gap-1.5 transition-all active:scale-90 flex-1 justify-center ${activeTab === 'stats' ? 'text-teal-950 scale-105' : 'text-slate-500'}`}
         >
           <TrendingUp className={`w-6 h-6 sm:w-7 sm:h-7 ${activeTab === 'stats' ? 'text-teal-900 stroke-[3px]' : 'text-slate-400 stroke-[2.5px]'}`} />
           <span className={`text-[10px] sm:text-[11px] font-black uppercase tracking-wider ${activeTab === 'stats' ? 'text-teal-950' : 'text-slate-500'}`}>Grafik</span>
         </button>
         <button 
           onClick={() => setActiveTab('emergency')}
-          className={`flex flex-col items-center gap-1 sm:gap-1.5 transition-all active:scale-90 min-w-[60px] sm:min-w-[70px] justify-center ${activeTab === 'emergency' ? 'text-red-900 scale-105' : 'text-slate-500'}`}
+          className={`flex flex-col items-center gap-1 sm:gap-1.5 transition-all active:scale-90 flex-1 justify-center ${activeTab === 'emergency' ? 'text-red-900 scale-105' : 'text-slate-500'}`}
         >
           <AlertTriangle className={`w-6 h-6 sm:w-7 sm:h-7 ${activeTab === 'emergency' ? 'fill-red-50 text-red-900 stroke-[3px]' : 'text-slate-400 stroke-[2.5px]'}`} />
           <span className={`text-[10px] sm:text-[11px] font-black uppercase tracking-wider ${activeTab === 'emergency' ? 'text-red-950' : 'text-slate-500'}`}>Boncos</span>
