@@ -31,11 +31,11 @@ const Card: React.FC<{ children: React.ReactNode, className?: string }> = ({ chi
 );
 
 const SectionHeader: React.FC<{ title: string, icon: React.ReactNode }> = ({ title, icon }) => (
-  <div className="flex items-center gap-1.5 sm:gap-2 mb-1.5 sm:mb-2 mt-3 sm:mt-4">
-    <div className="p-0.5 sm:p-1 bg-teal-100 text-teal-900 rounded-md shrink-0">
+  <div className="flex items-center gap-2 mb-2 sm:mb-3 mt-4 sm:mt-5">
+    <div className="p-1 sm:p-1.5 bg-teal-100 text-teal-900 rounded-lg shrink-0">
       {icon}
     </div>
-    <h2 className="text-xs sm:text-sm font-black text-slate-900 uppercase tracking-tight leading-tight">{title}</h2>
+    <h2 className="text-sm sm:text-base font-black text-slate-900 uppercase tracking-tight leading-tight">{title}</h2>
   </div>
 );
 
@@ -247,7 +247,7 @@ const App: React.FC = () => {
   }
 
   return (
-    <div className="max-w-xl mx-auto min-h-screen pb-16 sm:pb-20">
+    <div className="max-w-xl mx-auto min-h-screen pb-20 sm:pb-24">
       {/* Header */}
       <header className="bg-teal-900 text-white pt-3 sm:pt-4 pb-4 sm:pb-5 px-4 sm:px-6 rounded-b-xl sm:rounded-b-2xl shadow-xl relative overflow-hidden">
         <div className="absolute top-0 right-0 w-24 h-24 sm:w-40 sm:h-40 bg-teal-800 rounded-full -mr-10 sm:-mr-16 -mt-10 sm:-mt-16 opacity-30 blur-3xl"></div>
@@ -304,70 +304,70 @@ const App: React.FC = () => {
       </header>
 
       {/* Navigation Tabs */}
-      <div className="px-4 sm:px-5 -mt-3 sm:-mt-4 relative z-20">
-        <div className="bg-white rounded-lg sm:rounded-xl shadow-lg border-2 border-slate-200 p-1 sm:p-1.5 flex gap-1 sm:gap-1.5 relative overflow-hidden">
+      <div className="px-4 sm:px-5 -mt-4 sm:-mt-5 relative z-20">
+        <div className="bg-white rounded-xl sm:rounded-2xl shadow-xl border-2 border-slate-200 p-1.5 sm:p-2 flex gap-1.5 sm:gap-2 relative overflow-hidden">
           {/* Animated background indicator with gradient */}
           <div 
-            className={`absolute top-1 sm:top-1.5 bottom-1 sm:bottom-1.5 rounded-md sm:rounded-lg bg-gradient-to-r from-teal-700 to-teal-600 transition-all duration-500 ease-out shadow-md shadow-teal-500/30 ${
-              activeTab === 'daily' ? 'left-1 sm:left-1.5 w-[calc(33.333%-0.5rem)]' :
-              activeTab === 'stats' ? 'left-[calc(33.333%+0.125rem)] w-[calc(33.333%-0.5rem)]' :
-              'left-[calc(66.666%+0.125rem)] w-[calc(33.333%-0.5rem)]'
+            className={`absolute top-1.5 sm:top-2 bottom-1.5 sm:bottom-2 rounded-lg sm:rounded-xl bg-gradient-to-r from-teal-700 to-teal-600 transition-all duration-500 ease-out shadow-lg shadow-teal-500/30 ${
+              activeTab === 'daily' ? 'left-1.5 sm:left-2 w-[calc(33.333%-0.75rem)]' :
+              activeTab === 'stats' ? 'left-[calc(33.333%+0.25rem)] w-[calc(33.333%-0.75rem)]' :
+              'left-[calc(66.666%+0.25rem)] w-[calc(33.333%-0.75rem)]'
             }`}
           />
           <button 
             onClick={() => setActiveTab('daily')}
-            className={`flex-1 py-2 sm:py-2.5 px-1.5 sm:px-2 rounded-md sm:rounded-lg text-[10px] sm:text-[11px] font-black transition-all duration-300 flex items-center justify-center gap-1 sm:gap-1.5 min-h-[36px] relative z-10 ${
+            className={`flex-1 py-2.5 sm:py-3 px-2 sm:px-3 rounded-lg sm:rounded-xl text-[11px] sm:text-[12px] font-black transition-all duration-300 flex items-center justify-center gap-1.5 sm:gap-2 min-h-[40px] relative z-10 ${
               activeTab === 'daily' 
                 ? 'text-white transform scale-[1.02]' 
                 : 'text-slate-700 hover:text-teal-700 active:scale-95'
             }`}
           >
-            <CheckCircle className={`w-3 h-3 sm:w-3.5 sm:h-3.5 transition-all ${activeTab === 'daily' ? 'scale-110 drop-shadow-md' : ''}`} /> 
+            <CheckCircle className={`w-3.5 h-3.5 sm:w-4 sm:h-4 transition-all ${activeTab === 'daily' ? 'scale-110 drop-shadow-lg' : ''}`} /> 
             <span>HARIAN</span>
           </button>
           <button 
             onClick={() => setActiveTab('stats')}
-            className={`flex-1 py-2 sm:py-2.5 px-1.5 sm:px-2 rounded-md sm:rounded-lg text-[10px] sm:text-[11px] font-black transition-all duration-300 flex items-center justify-center gap-1 sm:gap-1.5 min-h-[36px] relative z-10 ${
+            className={`flex-1 py-2.5 sm:py-3 px-2 sm:px-3 rounded-lg sm:rounded-xl text-[11px] sm:text-[12px] font-black transition-all duration-300 flex items-center justify-center gap-1.5 sm:gap-2 min-h-[40px] relative z-10 ${
               activeTab === 'stats' 
                 ? 'text-white transform scale-[1.02]' 
                 : 'text-slate-700 hover:text-teal-700 active:scale-95'
             }`}
           >
-            <TrendingUp className={`w-3 h-3 sm:w-3.5 sm:h-3.5 transition-all ${activeTab === 'stats' ? 'scale-110 drop-shadow-md' : ''}`} /> 
+            <TrendingUp className={`w-3.5 h-3.5 sm:w-4 sm:h-4 transition-all ${activeTab === 'stats' ? 'scale-110 drop-shadow-lg' : ''}`} /> 
             <span>GRAFIK</span>
           </button>
           <button 
             onClick={() => setActiveTab('emergency')}
-            className={`flex-1 py-2 sm:py-2.5 px-1.5 sm:px-2 rounded-md sm:rounded-lg text-[10px] sm:text-[11px] font-black transition-all duration-300 flex items-center justify-center gap-1 sm:gap-1.5 min-h-[36px] relative z-10 ${
+            className={`flex-1 py-2.5 sm:py-3 px-2 sm:px-3 rounded-lg sm:rounded-xl text-[11px] sm:text-[12px] font-black transition-all duration-300 flex items-center justify-center gap-1.5 sm:gap-2 min-h-[40px] relative z-10 ${
               activeTab === 'emergency' 
-                ? 'text-white transform scale-[1.02] bg-gradient-to-r from-red-600 to-red-500 rounded-md sm:rounded-lg' 
+                ? 'text-white transform scale-[1.02] bg-gradient-to-r from-red-600 to-red-500 rounded-lg sm:rounded-xl' 
                 : 'text-slate-700 hover:text-red-600 active:scale-95'
             }`}
           >
-            <AlertTriangle className={`w-3 h-3 sm:w-3.5 sm:h-3.5 transition-all ${activeTab === 'emergency' ? 'scale-110 drop-shadow-md' : ''}`} /> 
+            <AlertTriangle className={`w-3.5 h-3.5 sm:w-4 sm:h-4 transition-all ${activeTab === 'emergency' ? 'scale-110 drop-shadow-lg' : ''}`} /> 
             <span>BONCOS</span>
           </button>
         </div>
       </div>
 
-      <main className="px-4 sm:px-5 mt-3 sm:mt-4">
+      <main className="px-4 sm:px-5 mt-4 sm:mt-6">
         {activeTab === 'daily' && (
-          <div className="space-y-3 sm:space-y-4">
+          <div className="space-y-4 sm:space-y-5">
             {/* A. PRINSIP DASAR */}
-            <div className="mb-3 sm:mb-4">
-              <SectionHeader title="A. Prinsip Dasar" icon={<Star className="w-3 h-3 sm:w-3.5 sm:h-3.5" />} />
-              <Card className="bg-amber-50 border-2 border-amber-300 shadow-md">
-                <div className="p-2.5 sm:p-3">
-                  <h3 className="font-black text-amber-950 text-[10px] sm:text-[11px] mb-2 sm:mb-2.5 uppercase tracking-wider flex items-center gap-1">
-                    <Heart className="w-2.5 h-2.5 sm:w-3 sm:h-3 text-amber-700 shrink-0" /> Pegang Setiap Hari
+            <div className="mb-4 sm:mb-6">
+              <SectionHeader title="A. Prinsip Dasar" icon={<Star className="w-4 h-4 sm:w-5 sm:h-5" />} />
+              <Card className="bg-amber-50 border-2 border-amber-300 shadow-lg">
+                <div className="p-3 sm:p-4">
+                  <h3 className="font-black text-amber-950 text-xs sm:text-sm mb-3 sm:mb-4 uppercase tracking-wider flex items-center gap-2">
+                    <Heart className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-amber-700 shrink-0" /> Pegang Setiap Hari
                   </h3>
-                  <div className="grid gap-1.5 sm:gap-2">
+                  <div className="grid gap-2 sm:gap-3">
                     {prinsipDasar.map((prinsip, index) => (
-                      <div key={index} className="flex gap-1.5 sm:gap-2 items-start">
-                        <div className="w-4 h-4 sm:w-5 sm:h-5 rounded-md bg-amber-200 text-amber-900 flex items-center justify-center font-black text-[9px] sm:text-[10px] shrink-0 border border-amber-300">
+                      <div key={index} className="flex gap-2 sm:gap-3 items-start">
+                        <div className="w-5 h-5 sm:w-6 sm:h-6 rounded-lg bg-amber-200 text-amber-900 flex items-center justify-center font-black text-[10px] sm:text-xs shrink-0 border-2 border-amber-300 shadow-sm">
                           {index + 1}
                         </div>
-                        <p className="text-[11px] sm:text-[12px] text-slate-950 font-black leading-tight">
+                        <p className="text-[12px] sm:text-[13px] text-slate-950 font-black leading-snug">
                           {prinsip}
                         </p>
                       </div>
@@ -379,45 +379,45 @@ const App: React.FC = () => {
 
             {/* Habit Categories */}
             {(Object.entries(groupedHabits) as [HabitCategory, Habit[]][]).map(([category, habits]) => (
-              <div key={category} className="mb-3 sm:mb-4">
+              <div key={category} className="mb-4 sm:mb-6">
                 <SectionHeader 
                   title={category} 
                   icon={
-                    category === HabitCategory.PAGI_DINI_HARI ? <Moon className="w-3 h-3 sm:w-3.5 sm:h-3.5" /> :
-                    category === HabitCategory.KERJA_DIGITAL ? <ShieldCheck className="w-3 h-3 sm:w-3.5 sm:h-3.5" /> :
-                    <CheckCircle className="w-3 h-3 sm:w-3.5 sm:h-3.5" />
+                    category === HabitCategory.PAGI_DINI_HARI ? <Moon className="w-4 h-4 sm:w-5 sm:h-5" /> :
+                    category === HabitCategory.KERJA_DIGITAL ? <ShieldCheck className="w-4 h-4 sm:w-5 sm:h-5" /> :
+                    <CheckCircle className="w-4 h-4 sm:w-5 sm:h-5" />
                   } 
                 />
-                <div className="space-y-1.5 sm:space-y-2">
+                <div className="space-y-2 sm:space-y-3">
                   {habits.map(habit => {
                     const isCompleted = todayProgress.completedHabitIds.includes(habit.id);
                     return (
                     <Card key={habit.id} className={`group transition-all duration-500 ease-out ${
                       isCompleted 
-                        ? 'bg-gradient-to-br from-teal-50 to-teal-100/50 border-2 border-teal-300/60 shadow-sm' 
-                        : 'bg-white border-2 border-slate-200 shadow-md hover:shadow-lg hover:border-teal-400'
+                        ? 'bg-gradient-to-br from-teal-50 to-teal-100/50 border-2 border-teal-300/60 shadow-md' 
+                        : 'bg-white border-2 border-slate-200 shadow-lg hover:shadow-xl hover:border-teal-400'
                     }`}>
-                      <div className="p-2.5 sm:p-3">
-                        <div className="flex items-center gap-2.5 sm:gap-3">
+                      <div className="p-3 sm:p-4">
+                        <div className="flex items-center gap-3 sm:gap-4">
                           <button 
                             onClick={() => toggleHabit(habit.id)}
-                            className={`shrink-0 transition-all duration-300 ease-out active:scale-90 min-w-[40px] min-h-[40px] sm:min-w-[44px] sm:min-h-[44px] flex items-center justify-center rounded-lg ${
+                            className={`shrink-0 transition-all duration-300 ease-out active:scale-90 min-w-[44px] min-h-[44px] sm:min-w-[48px] sm:min-h-[48px] flex items-center justify-center rounded-xl ${
                               isCompleted 
-                                ? 'bg-gradient-to-br from-teal-600 to-teal-700 shadow-md shadow-teal-500/50 scale-105' 
+                                ? 'bg-gradient-to-br from-teal-600 to-teal-700 shadow-lg shadow-teal-500/50 scale-105' 
                                 : 'bg-gradient-to-br from-slate-100 to-slate-200 hover:from-teal-100 hover:to-teal-200 shadow-inner hover:scale-105'
                             }`}
                           >
                             {isCompleted ? (
-                              <CheckCircle className="w-5 h-5 sm:w-6 sm:h-6 text-white fill-white stroke-2 drop-shadow-md animate-in zoom-in duration-300" />
+                              <CheckCircle className="w-6 h-6 sm:w-7 sm:h-7 text-white fill-white stroke-2 drop-shadow-lg animate-in zoom-in duration-300" />
                             ) : (
-                              <Circle className="w-5 h-5 sm:w-6 sm:h-6 text-slate-500 stroke-[3px] group-hover:text-teal-600 transition-colors" />
+                              <Circle className="w-6 h-6 sm:w-7 sm:h-7 text-slate-500 stroke-[3px] group-hover:text-teal-600 transition-colors" />
                             )}
                           </button>
                           <div 
                             className="flex-1 cursor-pointer min-w-0" 
                             onClick={() => setExpandedHabitId(expandedHabitId === habit.id ? null : habit.id)}
                           >
-                            <h4 className={`font-black text-[14px] sm:text-[15px] leading-tight tracking-tight transition-all duration-300 ${
+                            <h4 className={`font-black text-[15px] sm:text-[16px] leading-tight tracking-tight transition-all duration-300 ${
                               isCompleted 
                                 ? 'line-through text-slate-500 decoration-2 decoration-teal-600' 
                                 : 'text-slate-950 group-hover:text-teal-900'
@@ -425,7 +425,7 @@ const App: React.FC = () => {
                               {habit.title}
                             </h4>
                             {habit.description && (
-                              <p className={`text-[11px] sm:text-[12px] mt-0.5 sm:mt-1 font-semibold leading-tight transition-colors ${
+                              <p className={`text-[12px] sm:text-[13px] mt-1 sm:mt-1.5 font-semibold leading-relaxed transition-colors ${
                                 isCompleted 
                                   ? 'text-slate-400' 
                                   : 'text-slate-700 group-hover:text-slate-900'
@@ -437,7 +437,7 @@ const App: React.FC = () => {
                           {(habit.prayer || habit.description) && (
                             <button 
                               onClick={() => setExpandedHabitId(expandedHabitId === habit.id ? null : habit.id)}
-                              className={`p-1.5 sm:p-2 rounded-lg sm:rounded-xl transition-all duration-300 shrink-0 min-w-[36px] min-h-[36px] flex items-center justify-center ${
+                              className={`p-2 sm:p-2.5 rounded-lg sm:rounded-xl transition-all duration-300 shrink-0 min-w-[40px] min-h-[40px] flex items-center justify-center ${
                                 expandedHabitId === habit.id
                                   ? 'bg-teal-100 text-teal-900 border-2 border-teal-300 shadow-inner'
                                   : 'bg-slate-50 text-slate-600 border-2 border-slate-200 hover:bg-teal-50 hover:text-teal-700 hover:border-teal-300 active:scale-95'
@@ -453,21 +453,21 @@ const App: React.FC = () => {
                         </div>
 
                         {expandedHabitId === habit.id && habit.prayer && (
-                          <div className="mt-2 sm:mt-2.5 p-3 sm:p-4 bg-gradient-to-br from-teal-900 via-teal-800 to-teal-900 rounded-lg sm:rounded-xl text-white shadow-lg border-2 border-teal-700/50 backdrop-blur-sm animate-in slide-in-from-top-2 duration-300">
-                            <div className="text-right text-lg sm:text-xl font-serif mb-2 sm:mb-3 leading-tight tracking-wide drop-shadow-md">
+                          <div className="mt-3 sm:mt-4 p-4 sm:p-5 bg-gradient-to-br from-teal-900 via-teal-800 to-teal-900 rounded-xl sm:rounded-2xl text-white shadow-xl border-2 border-teal-700/50 backdrop-blur-sm animate-in slide-in-from-top-2 duration-300">
+                            <div className="text-right text-xl sm:text-2xl font-serif mb-3 sm:mb-4 leading-relaxed tracking-wider drop-shadow-lg">
                               {habit.prayer.arabic}
                             </div>
                             {habit.prayer.latin && (
-                              <p className="text-[10px] sm:text-[11px] italic text-teal-100 mb-2 sm:mb-2.5 font-semibold border-b border-white/30 pb-2 sm:pb-3 leading-tight tracking-wide">
+                              <p className="text-[11px] sm:text-[12px] italic text-teal-100 mb-3 sm:mb-4 font-semibold border-b border-white/30 pb-3 sm:pb-4 leading-relaxed tracking-wide">
                                 {habit.prayer.latin}
                               </p>
                             )}
-                            <p className="text-[11px] sm:text-xs font-bold text-white leading-tight">
+                            <p className="text-xs sm:text-sm font-bold text-white leading-relaxed">
                               "{habit.prayer.translation}"
                             </p>
                             {habit.prayer.context && (
-                              <div className="mt-2 sm:mt-2.5 pt-2 sm:pt-2.5 border-t border-white/30 text-[9px] sm:text-[10px] text-teal-200 uppercase tracking-wide font-black flex items-center gap-1.5">
-                                <Info className="w-3 h-3 sm:w-3.5 sm:h-3.5 shrink-0" /> <span>{habit.prayer.context}</span>
+                              <div className="mt-3 sm:mt-4 pt-3 sm:pt-4 border-t border-white/30 text-[10px] sm:text-[11px] text-teal-200 uppercase tracking-wider font-black flex items-center gap-2">
+                                <Info className="w-3.5 h-3.5 sm:w-4 sm:h-4 shrink-0" /> <span>{habit.prayer.context}</span>
                               </div>
                             )}
                           </div>
@@ -481,23 +481,23 @@ const App: React.FC = () => {
             ))}
 
             {/* Muhasabah Bisnis - Fixed Contrast */}
-            <SectionHeader title="Muhasabah Bisnis" icon={<Heart className="w-3 h-3 sm:w-3.5 sm:h-3.5" />} />
-            <Card className="p-3 sm:p-4 mb-6 sm:mb-8 bg-white border-2 border-slate-300 shadow-lg">
-              <h3 className="font-black text-sm sm:text-base mb-3 sm:mb-4 flex items-center gap-1.5 text-teal-950 uppercase tracking-tighter">
-                <Info className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-teal-700 shrink-0" /> <span>Refleksi Penutup Hari</span>
+            <SectionHeader title="Muhasabah Bisnis" icon={<Heart className="w-4 h-4 sm:w-5 sm:h-5" />} />
+            <Card className="p-4 sm:p-5 mb-8 sm:mb-10 bg-white border-2 border-slate-300 shadow-xl">
+              <h3 className="font-black text-base sm:text-lg mb-4 sm:mb-5 flex items-center gap-2 text-teal-950 uppercase tracking-tighter">
+                <Info className="w-4 h-4 sm:w-5 sm:h-5 text-teal-700 shrink-0" /> <span>Refleksi Penutup Hari</span>
               </h3>
-              <div className="space-y-2 sm:space-y-2.5">
+              <div className="space-y-3 sm:space-y-4">
                 {[
                   { key: 'jujur', label: 'Apakah hari ini saya jujur?' },
                   { key: 'followUp', label: 'Ada klien belum ditindaklanjuti?' },
                   { key: 'hakOrang', label: 'Ada hak orang tertunda?' },
                   { key: 'dosaDigital', label: 'Ada dosa digital (manipulasi)?' }
                 ].map(({ key, label }) => (
-                  <label key={key} className="flex items-center justify-between p-2.5 sm:p-3 rounded-lg sm:rounded-xl bg-slate-50 border-2 border-slate-200 cursor-pointer hover:bg-slate-100 active:bg-slate-100 transition-all active:scale-[0.97] group min-h-[44px]">
-                    <span className="text-[10px] sm:text-[11px] font-black text-slate-950 tracking-tight group-hover:text-teal-900 pr-2">{label}</span>
+                  <label key={key} className="flex items-center justify-between p-3 sm:p-4 rounded-xl sm:rounded-2xl bg-slate-50 border-2 border-slate-200 cursor-pointer hover:bg-slate-100 active:bg-slate-100 transition-all active:scale-[0.97] group min-h-[50px]">
+                    <span className="text-xs sm:text-sm font-black text-slate-950 tracking-tight group-hover:text-teal-900 pr-2">{label}</span>
                     <input 
                       type="checkbox" 
-                      className="w-6 h-6 sm:w-7 sm:h-7 rounded-md sm:rounded-lg border-2 border-slate-400 text-teal-800 focus:ring-teal-800 focus:ring-offset-1 shadow-inner transition-colors shrink-0 cursor-pointer"
+                      className="w-7 h-7 sm:w-8 sm:h-8 rounded-lg sm:rounded-xl border-2 border-slate-400 text-teal-800 focus:ring-teal-800 focus:ring-offset-2 shadow-inner transition-colors shrink-0 cursor-pointer"
                       checked={todayProgress.muhasabah[key as keyof DailyProgress['muhasabah']]}
                       onChange={() => toggleMuhasabah(key as keyof DailyProgress['muhasabah'])}
                     />
@@ -623,28 +623,28 @@ const App: React.FC = () => {
         )}
       </main>
 
-      {/* Persistent Bottom Nav - Fixed Styling with Safe Area */}
-      <nav className="fixed bottom-0 left-0 right-0 bg-white border-t-4 border-slate-100 px-4 sm:px-8 py-4 sm:py-6 pb-safe flex justify-around items-center z-50 max-w-xl mx-auto shadow-[0_-20px_60px_rgba(0,0,0,0.15)] rounded-t-[2rem] sm:rounded-t-[3.5rem]">
+      {/* Floating Bottom Nav */}
+      <nav className="fixed bottom-4 sm:bottom-6 left-1/2 transform -translate-x-1/2 bg-white border-2 border-slate-200 px-4 sm:px-6 py-3 sm:py-4 flex justify-around items-center z-50 max-w-xs sm:max-w-sm w-[calc(100%-2rem)] shadow-2xl rounded-2xl sm:rounded-3xl">
         <button 
           onClick={() => setActiveTab('daily')}
-          className={`flex flex-col items-center gap-1.5 sm:gap-2 transition-all active:scale-75 min-h-[60px] min-w-[60px] sm:min-w-0 justify-center ${activeTab === 'daily' ? 'text-teal-950 scale-110' : 'text-slate-400 opacity-60'}`}
+          className={`flex flex-col items-center gap-1 sm:gap-1.5 transition-all active:scale-90 min-w-[60px] sm:min-w-[70px] justify-center ${activeTab === 'daily' ? 'text-teal-950 scale-105' : 'text-slate-500'}`}
         >
-          <CheckCircle className={`w-7 h-7 sm:w-8 sm:h-8 ${activeTab === 'daily' ? 'fill-teal-100 text-teal-900 stroke-[3px]' : 'text-slate-900 stroke-[2.5px]'}`} />
-          <span className={`text-[11px] sm:text-[12px] font-black uppercase tracking-[0.08em] sm:tracking-[0.1em] ${activeTab === 'daily' ? 'text-teal-950' : 'text-slate-900'}`}>Harian</span>
+          <CheckCircle className={`w-6 h-6 sm:w-7 sm:h-7 ${activeTab === 'daily' ? 'fill-teal-100 text-teal-900 stroke-[3px]' : 'text-slate-400 stroke-[2.5px]'}`} />
+          <span className={`text-[10px] sm:text-[11px] font-black uppercase tracking-wider ${activeTab === 'daily' ? 'text-teal-950' : 'text-slate-500'}`}>Harian</span>
         </button>
         <button 
           onClick={() => setActiveTab('stats')}
-          className={`flex flex-col items-center gap-1.5 sm:gap-2 transition-all active:scale-75 min-h-[60px] min-w-[60px] sm:min-w-0 justify-center ${activeTab === 'stats' ? 'text-teal-950 scale-110' : 'text-slate-400 opacity-60'}`}
+          className={`flex flex-col items-center gap-1 sm:gap-1.5 transition-all active:scale-90 min-w-[60px] sm:min-w-[70px] justify-center ${activeTab === 'stats' ? 'text-teal-950 scale-105' : 'text-slate-500'}`}
         >
-          <TrendingUp className={`w-7 h-7 sm:w-8 sm:h-8 ${activeTab === 'stats' ? 'text-teal-900 stroke-[3px]' : 'text-slate-900 stroke-[2.5px]'}`} />
-          <span className={`text-[11px] sm:text-[12px] font-black uppercase tracking-[0.08em] sm:tracking-[0.1em] ${activeTab === 'stats' ? 'text-teal-950' : 'text-slate-900'}`}>Grafik</span>
+          <TrendingUp className={`w-6 h-6 sm:w-7 sm:h-7 ${activeTab === 'stats' ? 'text-teal-900 stroke-[3px]' : 'text-slate-400 stroke-[2.5px]'}`} />
+          <span className={`text-[10px] sm:text-[11px] font-black uppercase tracking-wider ${activeTab === 'stats' ? 'text-teal-950' : 'text-slate-500'}`}>Grafik</span>
         </button>
         <button 
           onClick={() => setActiveTab('emergency')}
-          className={`flex flex-col items-center gap-1.5 sm:gap-2 transition-all active:scale-75 min-h-[60px] min-w-[60px] sm:min-w-0 justify-center ${activeTab === 'emergency' ? 'text-red-900 scale-110' : 'text-slate-400 opacity-60'}`}
+          className={`flex flex-col items-center gap-1 sm:gap-1.5 transition-all active:scale-90 min-w-[60px] sm:min-w-[70px] justify-center ${activeTab === 'emergency' ? 'text-red-900 scale-105' : 'text-slate-500'}`}
         >
-          <AlertTriangle className={`w-7 h-7 sm:w-8 sm:h-8 ${activeTab === 'emergency' ? 'fill-red-50 text-red-900 stroke-[3px]' : 'text-slate-900 stroke-[2.5px]'}`} />
-          <span className={`text-[11px] sm:text-[12px] font-black uppercase tracking-[0.08em] sm:tracking-[0.1em] ${activeTab === 'emergency' ? 'text-red-950' : 'text-slate-900'}`}>Boncos</span>
+          <AlertTriangle className={`w-6 h-6 sm:w-7 sm:h-7 ${activeTab === 'emergency' ? 'fill-red-50 text-red-900 stroke-[3px]' : 'text-slate-400 stroke-[2.5px]'}`} />
+          <span className={`text-[10px] sm:text-[11px] font-black uppercase tracking-wider ${activeTab === 'emergency' ? 'text-red-950' : 'text-slate-500'}`}>Boncos</span>
         </button>
       </nav>
     </div>
