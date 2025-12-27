@@ -58,11 +58,15 @@ jobs:
           echo "✅ Build output verified"
           ls -la dist/
 
+      - name: Setup Firebase CLI
+        run: npm install -g firebase-tools
+
       - name: Deploy to Firebase
-        uses: FirebaseExtended/action-hosting-deploy@v0
-        with:
-          repoToken: '${{ secrets.GITHUB_TOKEN }}'
-          firebaseServiceAccount: '${{ secrets.FIREBASE_SERVICE_ACCOUNT }}'
-          channelId: live
-          projectId: aplikasi-amalan-harian
+        run: |
+          echo "${{ secrets.FIREBASE_SERVICE_ACCOUNT }}" > $HOME/firebase-service-account.json
+          export GOOGLE_APPLICATION_CREDENTIALS="$HOME/firebase-service-account.json"
+          firebase deploy --only hosting --project aplikasi-amalan-harian --token "${{ secrets.FIREBASE_TOKEN }}" || firebase deploy --only hosting --project aplikasi-amalan-harian
+        env:
+          FIREBASE_TOKEN: ${{ secrets.FIREBASE_TOKEN }}
+        continue-on-error: false
 
