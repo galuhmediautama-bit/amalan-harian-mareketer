@@ -25,7 +25,7 @@ import { getUserData, saveUserData, subscribeToUserData, migrateFromLocalStorage
 
 // Helper components
 const Card: React.FC<{ children: React.ReactNode, className?: string }> = ({ children, className = "" }) => (
-  <div className={`rounded-2xl shadow-sm border border-slate-200 overflow-hidden ${className}`}>
+  <div className={`rounded-2xl shadow-md border border-slate-200 overflow-hidden backdrop-blur-sm ${className}`}>
     {children}
   </div>
 );
@@ -356,15 +356,18 @@ const App: React.FC = () => {
             {/* A. PRINSIP DASAR */}
             <div className="mb-4">
               <SectionHeader title="A. Prinsip Dasar" icon={<Star className="w-4 h-4" />} />
-              <Card className="bg-amber-50 border-2 border-amber-300 shadow-lg">
+              <Card className="bg-gradient-to-br from-amber-50 via-amber-50/90 to-yellow-50 border-2 border-amber-300/80 shadow-xl ring-1 ring-amber-200/50">
                 <div className="p-3">
                   <h3 className="font-black text-amber-950 text-xs mb-3 uppercase tracking-wider flex items-center gap-2">
-                    <Heart className="w-3.5 h-3.5 text-amber-700 shrink-0" /> Pegang Setiap Hari
+                    <div className="p-1 bg-amber-200 rounded-lg">
+                      <Heart className="w-3.5 h-3.5 text-amber-700 shrink-0" />
+                    </div>
+                    <span>Pegang Setiap Hari</span>
                   </h3>
                   <div className="grid gap-2">
                     {prinsipDasar.map((prinsip, index) => (
-                      <div key={index} className="flex gap-2 items-start">
-                        <div className="w-5 h-5 rounded-lg bg-amber-200 text-amber-900 flex items-center justify-center font-black text-[10px] shrink-0 border-2 border-amber-300 shadow-sm">
+                      <div key={index} className="flex gap-2 items-start p-1.5 rounded-lg hover:bg-amber-100/50 transition-colors">
+                        <div className="w-5 h-5 rounded-lg bg-gradient-to-br from-amber-300 to-amber-400 text-amber-900 flex items-center justify-center font-black text-[10px] shrink-0 border-2 border-amber-400 shadow-sm ring-1 ring-amber-200">
                           {index + 1}
                         </div>
                         <p className="text-[12px] text-slate-950 font-black leading-snug">
@@ -394,8 +397,8 @@ const App: React.FC = () => {
                     return (
                     <Card key={habit.id} className={`group transition-all duration-500 ease-out ${
                       isCompleted 
-                        ? 'bg-gradient-to-br from-teal-50 to-teal-100/50 border-2 border-teal-300/60 shadow-md' 
-                        : 'bg-white border-2 border-slate-200 shadow-lg hover:shadow-xl hover:border-teal-400'
+                        ? 'bg-gradient-to-br from-teal-50 via-teal-50/80 to-teal-100/50 border-2 border-teal-300/70 shadow-md ring-1 ring-teal-200/50' 
+                        : 'bg-white border-2 border-slate-200 shadow-lg hover:shadow-2xl hover:border-teal-400 hover:-translate-y-0.5 active:translate-y-0'
                     }`}>
                       <div className="p-3">
                         <div className="flex items-center gap-3">
@@ -403,12 +406,12 @@ const App: React.FC = () => {
                             onClick={() => toggleHabit(habit.id)}
                             className={`shrink-0 transition-all duration-300 ease-out active:scale-90 min-w-[44px] min-h-[44px] flex items-center justify-center rounded-xl ${
                               isCompleted 
-                                ? 'bg-gradient-to-br from-teal-600 to-teal-700 shadow-lg shadow-teal-500/50 scale-105' 
-                                : 'bg-gradient-to-br from-slate-100 to-slate-200 hover:from-teal-100 hover:to-teal-200 shadow-inner hover:scale-105'
+                                ? 'bg-gradient-to-br from-teal-600 via-teal-600 to-teal-700 shadow-xl shadow-teal-500/60 scale-105 ring-2 ring-teal-400/50' 
+                                : 'bg-gradient-to-br from-slate-100 via-slate-50 to-slate-200 hover:from-teal-100 hover:via-teal-50 hover:to-teal-200 shadow-inner hover:scale-105 hover:ring-2 hover:ring-teal-200/50'
                             }`}
                           >
                             {isCompleted ? (
-                              <CheckCircle className="w-6 h-6 text-white fill-white stroke-2 drop-shadow-lg animate-in zoom-in duration-300" />
+                              <CheckCircle className="w-6 h-6 text-white fill-white stroke-2 drop-shadow-xl animate-in zoom-in duration-300" />
                             ) : (
                               <Circle className="w-6 h-6 text-slate-500 stroke-[3px] group-hover:text-teal-600 transition-colors" />
                             )}
@@ -453,20 +456,20 @@ const App: React.FC = () => {
                         </div>
 
                         {expandedHabitId === habit.id && habit.prayer && (
-                          <div className="mt-3 p-3.5 bg-gradient-to-br from-teal-900 via-teal-800 to-teal-900 rounded-xl text-white shadow-xl border-2 border-teal-700/50 backdrop-blur-sm animate-in slide-in-from-top-2 duration-300">
-                            <div className="text-right text-lg font-serif mb-3 leading-relaxed tracking-wider drop-shadow-lg">
+                          <div className="mt-3 p-3.5 bg-gradient-to-br from-teal-900 via-teal-800 to-teal-900 rounded-xl text-white shadow-2xl border-2 border-teal-700/60 backdrop-blur-sm animate-in slide-in-from-top-2 duration-300 ring-2 ring-teal-700/30">
+                            <div className="text-right text-lg font-serif mb-3 leading-relaxed tracking-wider drop-shadow-xl">
                               {habit.prayer.arabic}
                             </div>
                             {habit.prayer.latin && (
-                              <p className="text-[11px] italic text-teal-100 mb-3 font-semibold border-b border-white/30 pb-3 leading-relaxed tracking-wide">
+                              <p className="text-[11px] italic text-teal-100 mb-3 font-semibold border-b border-white/40 pb-3 leading-relaxed tracking-wide">
                                 {habit.prayer.latin}
                               </p>
                             )}
-                            <p className="text-xs font-bold text-white leading-relaxed">
+                            <p className="text-xs font-bold text-white leading-relaxed drop-shadow-sm">
                               "{habit.prayer.translation}"
                             </p>
                             {habit.prayer.context && (
-                              <div className="mt-3 pt-3 border-t border-white/30 text-[10px] text-teal-200 uppercase tracking-wider font-black flex items-center gap-2">
+                              <div className="mt-3 pt-3 border-t border-white/40 text-[10px] text-teal-200 uppercase tracking-wider font-black flex items-center gap-2">
                                 <Info className="w-3.5 h-3.5 shrink-0" /> <span>{habit.prayer.context}</span>
                               </div>
                             )}
@@ -482,9 +485,12 @@ const App: React.FC = () => {
 
             {/* Muhasabah Bisnis - Fixed Contrast */}
             <SectionHeader title="Muhasabah Bisnis" icon={<Heart className="w-4 h-4" />} />
-            <Card className="p-4 mb-8 bg-white border-2 border-slate-300 shadow-xl">
+            <Card className="p-4 mb-8 bg-gradient-to-br from-white to-slate-50/50 border-2 border-slate-300/80 shadow-xl ring-1 ring-slate-200/50">
               <h3 className="font-black text-base mb-4 flex items-center gap-2 text-teal-950 uppercase tracking-tighter">
-                <Info className="w-4 h-4 text-teal-700 shrink-0" /> <span>Refleksi Penutup Hari</span>
+                <div className="p-1 bg-teal-100 rounded-lg">
+                  <Info className="w-4 h-4 text-teal-700 shrink-0" />
+                </div>
+                <span>Refleksi Penutup Hari</span>
               </h3>
               <div className="space-y-3">
                 {[
@@ -493,11 +499,11 @@ const App: React.FC = () => {
                   { key: 'hakOrang', label: 'Ada hak orang tertunda?' },
                   { key: 'dosaDigital', label: 'Ada dosa digital (manipulasi)?' }
                 ].map(({ key, label }) => (
-                  <label key={key} className="flex items-center justify-between p-3 rounded-xl bg-slate-50 border-2 border-slate-200 cursor-pointer hover:bg-slate-100 active:bg-slate-100 transition-all active:scale-[0.97] group min-h-[48px]">
-                    <span className="text-xs font-black text-slate-950 tracking-tight group-hover:text-teal-900 pr-2">{label}</span>
+                  <label key={key} className="flex items-center justify-between p-3 rounded-xl bg-gradient-to-r from-slate-50 to-slate-100/50 border-2 border-slate-200/80 cursor-pointer hover:bg-gradient-to-r hover:from-teal-50 hover:to-teal-100/50 hover:border-teal-300 active:bg-slate-100 transition-all active:scale-[0.97] group min-h-[48px] shadow-sm hover:shadow-md">
+                    <span className="text-xs font-black text-slate-950 tracking-tight group-hover:text-teal-900 pr-2 transition-colors">{label}</span>
                     <input 
                       type="checkbox" 
-                      className="w-7 h-7 rounded-lg border-2 border-slate-400 text-teal-800 focus:ring-teal-800 focus:ring-offset-2 shadow-inner transition-colors shrink-0 cursor-pointer"
+                      className="w-7 h-7 rounded-lg border-2 border-slate-400 text-teal-800 focus:ring-2 focus:ring-teal-500 focus:ring-offset-2 shadow-inner transition-all shrink-0 cursor-pointer checked:bg-teal-600 checked:border-teal-600 hover:scale-110"
                       checked={todayProgress.muhasabah[key as keyof DailyProgress['muhasabah']]}
                       onChange={() => toggleMuhasabah(key as keyof DailyProgress['muhasabah'])}
                     />
