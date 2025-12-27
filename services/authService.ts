@@ -95,14 +95,21 @@ export const getCurrentUser = async (): Promise<User | null> => {
  * Listen to auth state changes
  */
 export const onAuthChange = (callback: (user: User | null) => void): (() => void) => {
-  const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+  let isInitialized = false;
+  
+  const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+    console.log('Auth state changed:', event, session?.user?.email);
     callback(session?.user ?? null);
   });
 
-  // Initial check
-  supabase.auth.getUser().then(({ data: { user } }) => {
-    callback(user);
-  });
+  // Initial check - only call once
+  if (!isInitialized) {
+    isInitialized = true;
+    supabase.auth.getUser().then(({ data: { user } }) => {
+      console.log('Initial auth check:', user?.email || 'No user');
+      callback(user);
+    });
+  }
 
   return () => {
     subscription.unsubscribe();

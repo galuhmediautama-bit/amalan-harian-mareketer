@@ -7,8 +7,8 @@ interface StatsChartProps {
 
 const StatsChart: React.FC<StatsChartProps> = ({ data }) => {
   return (
-    <div className="h-64 sm:h-80 w-full">
-      <ResponsiveContainer width="100%" height="100%">
+    <div className="h-64 sm:h-80 w-full min-h-[256px]">
+      <ResponsiveContainer width="100%" height="100%" minHeight={256}>
         <AreaChart data={data}>
           <defs>
             <linearGradient id="colorPoints" x1="0" y1="0" x2="0" y2="1">

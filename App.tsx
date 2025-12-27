@@ -1,5 +1,5 @@
 
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect, useMemo, Suspense } from 'react';
 import { 
   CheckCircle, 
   Circle, 
@@ -25,6 +25,31 @@ import { Habit, HabitCategory, DailyProgress, AppState } from './types';
 import Login from './components/Login';
 import { onAuthChange, signOutUser, getCurrentUser } from './services/authService';
 import { getUserData, saveUserData, subscribeToUserData, migrateFromLocalStorage } from './services/supabaseService';
+
+// Types for partnership feature
+type Partnership = {
+  id: number;
+  user1_id: string;
+  user2_id: string;
+  status: 'pending' | 'accepted' | 'rejected';
+  invited_by: string;
+  created_at: string;
+  updated_at: string;
+  partner?: {
+    id: string;
+    email: string;
+    name?: string;
+  };
+};
+
+type Message = {
+  id: number;
+  sender_id: string;
+  receiver_id: string;
+  message: string;
+  read: boolean;
+  created_at: string;
+};
 
 // Lazy load heavy dependencies - only load when needed
 const StatsChart = React.lazy(() => import('./components/StatsChart'));
@@ -84,8 +109,11 @@ const App: React.FC = () => {
   // Check authentication and load data
   useEffect(() => {
     let unsubscribeStorage: (() => void) | null = null;
+    let mounted = true;
 
     const unsubscribe = onAuthChange(async (currentUser) => {
+      if (!mounted) return;
+      
       setUser(currentUser);
       
       if (currentUser) {
@@ -94,25 +122,40 @@ const App: React.FC = () => {
           await migrateFromLocalStorage();
           
           const userData = await getUserData();
-          if (userData) {
+          if (userData && mounted) {
             setState(userData);
           }
 
           // Subscribe to real-time data changes
-          unsubscribeStorage = subscribeToUserData((updatedState) => {
-            if (updatedState) {
-              setState(updatedState);
-            }
-          });
+          if (mounted) {
+            unsubscribeStorage = subscribeToUserData((updatedState) => {
+              if (updatedState && mounted) {
+                setState(updatedState);
+              }
+            });
+          }
         } catch (error) {
           console.error('Error loading data:', error);
         }
+      } else {
+        // Clear state when user logs out
+        setState({
+          currentDate: new Date().toISOString().split('T')[0],
+          progress: {}
+        });
+        setPartnership(null);
+        setPendingInvitations({ sent: [], received: [] });
+        setPartnerProgress(null);
+        setMessages([]);
       }
       
-      setLoading(false);
+      if (mounted) {
+        setLoading(false);
+      }
     });
 
     return () => {
+      mounted = false;
       unsubscribe();
       if (unsubscribeStorage) {
         unsubscribeStorage();
@@ -300,11 +343,8 @@ const App: React.FC = () => {
   const handleLogout = async () => {
     try {
       await signOutUser();
-      setUser(null);
-      setState({
-        currentDate: new Date().toISOString().split('T')[0],
-        progress: {}
-      });
+      // User state will be updated by onAuthChange listener
+      // No need to manually set user to null
     } catch (error) {
       console.error('Error logging out:', error);
     }
@@ -633,39 +673,9 @@ const App: React.FC = () => {
               <h3 className="font-black text-slate-950 mb-6 sm:mb-10 flex items-center gap-2 sm:gap-3 text-lg sm:text-xl uppercase tracking-tight">
                 <TrendingUp className="w-6 h-6 sm:w-7 sm:h-7 text-teal-900 shrink-0" /> <span>Performa Amalan</span>
               </h3>
-              <div className="h-64 sm:h-80 w-full">
-                <ResponsiveContainer width="100%" height="100%">
-                  <AreaChart data={statsData}>
-                    <defs>
-                      <linearGradient id="colorPoints" x1="0" y1="0" x2="0" y2="1">
-                        <stop offset="5%" stopColor="#0f766e" stopOpacity={0.7}/>
-                        <stop offset="95%" stopColor="#0f766e" stopOpacity={0}/>
-                      </linearGradient>
-                    </defs>
-                    <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#cbd5e1" />
-                    <XAxis 
-                      dataKey="date" 
-                      axisLine={false} 
-                      tickLine={false} 
-                      tick={{fill: '#0f172a', fontSize: 11, fontWeight: 900}} 
-                    />
-                    <YAxis hide />
-                    <Tooltip 
-                      contentStyle={{
-                        borderRadius: '16px', 
-                        border: '3px solid #0f766e', 
-                        backgroundColor: '#ffffff',
-                        padding: '12px',
-                        boxShadow: '0 20px 40px -10px rgba(0,0,0,0.2)',
-                        fontSize: '12px'
-                      }}
-                      itemStyle={{ color: '#0f766e', fontWeight: '900', fontSize: '12px' }}
-                      labelStyle={{fontWeight: '900', color: '#0f172a', marginBottom: '6px', fontSize: '13px'}}
-                    />
-                    <Area type="monotone" dataKey="points" stroke="#0f766e" strokeWidth={5} fillOpacity={1} fill="url(#colorPoints)" />
-                  </AreaChart>
-                </ResponsiveContainer>
-              </div>
+              <Suspense fallback={<div className="text-center py-8 text-slate-500 font-bold">Loading Chart...</div>}>
+                <StatsChart data={statsData} />
+              </Suspense>
             </Card>
 
             <div className="grid grid-cols-2 gap-4 sm:gap-6">

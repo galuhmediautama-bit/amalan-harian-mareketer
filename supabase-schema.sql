@@ -19,6 +19,14 @@ CREATE INDEX IF NOT EXISTS idx_user_progress_updated_at ON user_progress(updated
 ALTER TABLE user_progress ENABLE ROW LEVEL SECURITY;
 
 -- Policy: User hanya bisa akses data miliknya sendiri
+-- Drop existing policies first (if they exist)
+DROP POLICY IF EXISTS "Users can view own progress" ON user_progress;
+DROP POLICY IF EXISTS "Users can insert own progress" ON user_progress;
+DROP POLICY IF EXISTS "Users can update own progress" ON user_progress;
+DROP POLICY IF EXISTS "Users can delete own progress" ON user_progress;
+DROP POLICY IF EXISTS "Partners can view each other's progress via RPC" ON user_progress;
+
+-- Create policies
 CREATE POLICY "Users can view own progress"
   ON user_progress
   FOR SELECT
@@ -50,6 +58,7 @@ END;
 $$ LANGUAGE plpgsql;
 
 -- Trigger untuk auto-update updated_at
+DROP TRIGGER IF EXISTS update_user_progress_updated_at ON user_progress;
 CREATE TRIGGER update_user_progress_updated_at
   BEFORE UPDATE ON user_progress
   FOR EACH ROW
@@ -76,6 +85,11 @@ CREATE INDEX IF NOT EXISTS idx_partnerships_status ON partnerships(status);
 -- Enable RLS untuk partnerships
 ALTER TABLE partnerships ENABLE ROW LEVEL SECURITY;
 
+-- Drop existing policies first (if they exist)
+DROP POLICY IF EXISTS "Users can view own partnerships" ON partnerships;
+DROP POLICY IF EXISTS "Users can create partnerships" ON partnerships;
+DROP POLICY IF EXISTS "Users can update own partnerships" ON partnerships;
+
 -- Policy: Users can view partnerships they're involved in
 CREATE POLICY "Users can view own partnerships"
   ON partnerships
@@ -96,6 +110,7 @@ CREATE POLICY "Users can update own partnerships"
   WITH CHECK (auth.uid() = user1_id OR auth.uid() = user2_id);
 
 -- Trigger untuk auto-update updated_at pada partnerships
+DROP TRIGGER IF EXISTS update_partnerships_updated_at ON partnerships;
 CREATE TRIGGER update_partnerships_updated_at
   BEFORE UPDATE ON partnerships
   FOR EACH ROW
@@ -119,6 +134,11 @@ CREATE INDEX IF NOT EXISTS idx_messages_created_at ON messages(created_at DESC);
 
 -- Enable RLS untuk messages
 ALTER TABLE messages ENABLE ROW LEVEL SECURITY;
+
+-- Drop existing policies first (if they exist)
+DROP POLICY IF EXISTS "Users can view own messages" ON messages;
+DROP POLICY IF EXISTS "Users can send messages" ON messages;
+DROP POLICY IF EXISTS "Users can update received messages" ON messages;
 
 -- Policy: Users can view messages they sent or received
 CREATE POLICY "Users can view own messages"
@@ -167,6 +187,9 @@ $$ LANGUAGE plpgsql SECURITY DEFINER;
 
 -- Alternative: RLS policy to allow viewing partner's progress
 -- This allows partners to see each other's progress
+-- Drop existing policy first (if it exists)
+DROP POLICY IF EXISTS "Users can view partner progress" ON user_progress;
+
 CREATE POLICY "Users can view partner progress"
   ON user_progress
   FOR SELECT

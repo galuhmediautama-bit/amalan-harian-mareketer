@@ -32,12 +32,16 @@ const Login: React.FC<LoginProps> = ({ onLoginSuccess }) => {
       }
       
       if (user) {
-        console.log('Auth successful, waiting for state update...');
-        // Wait a bit for auth state to propagate via onAuthChange
+        console.log('Auth successful, user will be updated via onAuthChange');
+        // Reset form
+        setEmail('');
+        setPassword('');
+        setName('');
+        setError('');
+        // Reset loading after a short delay to allow auth state to propagate
         setTimeout(() => {
           setLoading(false);
-          console.log('Loading state reset');
-        }, 1000);
+        }, 500);
       } else {
         console.warn('No user returned from auth');
         setError('Gagal autentikasi. Silakan coba lagi.');
@@ -75,6 +79,7 @@ const Login: React.FC<LoginProps> = ({ onLoginSuccess }) => {
                 value={name}
                 onChange={(e) => setName(e.target.value)}
                 required={isSignUp}
+                autoComplete="name"
                 className="w-full px-4 py-3 rounded-xl border-2 border-slate-300 focus:border-teal-600 focus:outline-none font-black text-slate-900"
                 placeholder="Nama Lengkap"
               />
@@ -90,6 +95,7 @@ const Login: React.FC<LoginProps> = ({ onLoginSuccess }) => {
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               required
+              autoComplete="email"
               className="w-full px-4 py-3 rounded-xl border-2 border-slate-300 focus:border-teal-600 focus:outline-none font-black text-slate-900"
               placeholder="email@internal.com"
             />
@@ -105,6 +111,7 @@ const Login: React.FC<LoginProps> = ({ onLoginSuccess }) => {
               onChange={(e) => setPassword(e.target.value)}
               required
               minLength={6}
+              autoComplete={isSignUp ? "new-password" : "current-password"}
               className="w-full px-4 py-3 rounded-xl border-2 border-slate-300 focus:border-teal-600 focus:outline-none font-black text-slate-900"
               placeholder="••••••••"
             />
