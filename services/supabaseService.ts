@@ -9,20 +9,31 @@ const TABLE_NAME = 'user_progress';
 export const getUserData = async (): Promise<AppState | null> => {
   try {
     const { data: { user } } = await supabase.auth.getUser();
-    if (!user) return null;
+    if (!user) {
+      console.log('No user found');
+      return null;
+    }
 
     const { data, error } = await supabase
       .from(TABLE_NAME)
-      .select('*')
+      .select('current_date_value, progress')
       .eq('user_id', user.id)
-      .single();
+      .maybeSingle();
 
-    if (error && error.code !== 'PGRST116') { // PGRST116 = not found
+    if (error) {
+      // PGRST116 = not found (no rows returned) - this is OK for new users
+      if (error.code === 'PGRST116') {
+        console.log('No user data found, returning default state');
+        return null;
+      }
       console.error('Error getting user data:', error);
       return null;
     }
 
-    if (!data) return null;
+    if (!data) {
+      console.log('No data returned');
+      return null;
+    }
 
     return {
       currentDate: data.current_date_value || new Date().toISOString().split('T')[0],

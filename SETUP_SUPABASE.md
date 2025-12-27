@@ -16,7 +16,12 @@
 1. Di Supabase Dashboard, klik **"Authentication"** di sidebar
 2. Klik **"Providers"**
 3. Pastikan **"Email"** sudah enabled
-4. (Opsional) Atur email confirmation jika perlu
+4. **PENTING: Disable Email Confirmation** (untuk development/testing):
+   - Klik **"Authentication"** → **"Settings"** (atau **"Email Templates"**)
+   - Scroll ke **"Email Auth"** section
+   - **Uncheck** atau **disable** "Enable email confirmations"
+   - Ini memungkinkan user langsung login setelah sign up tanpa perlu konfirmasi email
+   - **Catatan:** Untuk production, sebaiknya enable email confirmation untuk keamanan
 
 ### 3. Setup Row Level Security (RLS)
 
@@ -90,6 +95,16 @@ RLS sudah di-setup otomatis dari SQL schema, tapi pastikan:
 
 ### Error: "new row violates row-level security policy"
 **Solusi:** Pastikan user sudah authenticated dan policies sudah benar
+
+### Loading terus setelah sign up/login
+**Solusi:** 
+1. Pastikan email confirmation sudah di-disable (lihat langkah 2 di atas)
+2. Cek browser console untuk error messages
+3. Pastikan Supabase URL dan API key sudah benar
+4. Refresh halaman dan coba lagi
+
+### Error: "Sign up successful but user confirmation may be required"
+**Solusi:** Disable email confirmation di Authentication Settings (lihat langkah 2 di atas)
 
 ---
 

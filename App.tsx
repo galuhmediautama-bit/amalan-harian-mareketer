@@ -64,6 +64,7 @@ const App: React.FC = () => {
   const [activeTab, setActiveTab] = useState<'daily' | 'stats' | 'emergency'>('daily');
   const [expandedHabitId, setExpandedHabitId] = useState<string | null>(null);
   const [isSaving, setIsSaving] = useState(false);
+  const [currentPrinsipIndex, setCurrentPrinsipIndex] = useState(0);
 
   // Check authentication and load data
   useEffect(() => {
@@ -162,6 +163,25 @@ const App: React.FC = () => {
       });
   }, [state.progress]);
 
+  const prinsipDasar = useMemo(() => [
+    "Rezeki datang lewat kepercayaan (jujur & amanah)",
+    "Keputusan bisnis butuh hati yang bersih",
+    "Rezeki besar lahir dari manfaat besar",
+    "Amalan membuka pintu, ikhtiar yang memasukkan",
+    "Algoritma berubah, Allah tidak",
+    "Trust lebih kuat dari click",
+    "Konten jujur menarik audience yang tepat",
+    "Barakah menjaga performa jangka panjang"
+  ], []);
+
+  // Rotate prinsip dasar untuk ditampilkan di header
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setCurrentPrinsipIndex((prev) => (prev + 1) % prinsipDasar.length);
+    }, 5000); // Rotate every 5 seconds
+    return () => clearInterval(interval);
+  }, [prinsipDasar.length]);
+
   const handleLogout = async () => {
     try {
       await signOutUser();
@@ -225,27 +245,6 @@ const App: React.FC = () => {
   if (!user) {
     return <Login onLoginSuccess={() => {}} />;
   }
-
-  const prinsipDasar = [
-    "Rezeki datang lewat kepercayaan (jujur & amanah)",
-    "Keputusan bisnis butuh hati yang bersih",
-    "Rezeki besar lahir dari manfaat besar",
-    "Amalan membuka pintu, ikhtiar yang memasukkan",
-    "Algoritma berubah, Allah tidak",
-    "Trust lebih kuat dari click",
-    "Konten jujur menarik audience yang tepat",
-    "Barakah menjaga performa jangka panjang"
-  ];
-
-  // Rotate prinsip dasar untuk ditampilkan di header
-  const [currentPrinsipIndex, setCurrentPrinsipIndex] = useState(0);
-  
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setCurrentPrinsipIndex((prev) => (prev + 1) % prinsipDasar.length);
-    }, 5000); // Rotate every 5 seconds
-    return () => clearInterval(interval);
-  }, [prinsipDasar.length]);
 
   return (
     <div className="max-w-xl mx-auto min-h-screen pb-24 sm:pb-28">
