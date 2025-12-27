@@ -305,46 +305,46 @@ const App: React.FC = () => {
 
       {/* Navigation Tabs */}
       <div className="px-4 sm:px-5 -mt-6 sm:-mt-8 relative z-20">
-        <div className="bg-white rounded-2xl sm:rounded-3xl shadow-2xl border border-slate-200 p-1.5 sm:p-2 flex gap-1 sm:gap-0 relative">
-          {/* Animated background indicator */}
+        <div className="bg-white rounded-2xl sm:rounded-3xl shadow-2xl border-2 border-slate-200 p-2 sm:p-2.5 flex gap-2 sm:gap-2.5 relative overflow-hidden">
+          {/* Animated background indicator with gradient */}
           <div 
-            className={`absolute top-1.5 sm:top-2 bottom-1.5 sm:bottom-2 rounded-xl sm:rounded-2xl bg-teal-800 transition-all duration-300 ease-out shadow-lg ${
-              activeTab === 'daily' ? 'left-1.5 sm:left-2 w-[calc(33.333%-0.5rem)]' :
-              activeTab === 'stats' ? 'left-[calc(33.333%+0.25rem)] w-[calc(33.333%-0.5rem)]' :
-              'left-[calc(66.666%+0.25rem)] w-[calc(33.333%-0.5rem)]'
+            className={`absolute top-2 sm:top-2.5 bottom-2 sm:bottom-2.5 rounded-xl sm:rounded-2xl bg-gradient-to-r from-teal-700 to-teal-600 transition-all duration-500 ease-out shadow-xl shadow-teal-500/30 ${
+              activeTab === 'daily' ? 'left-2 sm:left-2.5 w-[calc(33.333%-1rem)]' :
+              activeTab === 'stats' ? 'left-[calc(33.333%+0.5rem)] w-[calc(33.333%-1rem)]' :
+              'left-[calc(66.666%+0.5rem)] w-[calc(33.333%-1rem)]'
             }`}
           />
           <button 
             onClick={() => setActiveTab('daily')}
-            className={`flex-1 py-3 sm:py-4 px-2 sm:px-4 rounded-xl sm:rounded-2xl text-[11px] sm:text-[13px] font-black transition-all duration-300 flex items-center justify-center gap-1 sm:gap-2 min-h-[44px] relative z-10 ${
+            className={`flex-1 py-3.5 sm:py-4 px-3 sm:px-4 rounded-xl sm:rounded-2xl text-[12px] sm:text-[13px] font-black transition-all duration-300 flex items-center justify-center gap-2 sm:gap-2.5 min-h-[48px] relative z-10 ${
               activeTab === 'daily' 
-                ? 'text-white transform scale-105' 
-                : 'text-slate-900 hover:text-teal-800 active:scale-95'
+                ? 'text-white transform scale-[1.02]' 
+                : 'text-slate-700 hover:text-teal-700 active:scale-95'
             }`}
           >
-            <CheckCircle className={`w-3.5 h-3.5 sm:w-4 sm:h-4 transition-all ${activeTab === 'daily' ? 'scale-110' : ''}`} /> 
+            <CheckCircle className={`w-4 h-4 sm:w-5 sm:h-5 transition-all ${activeTab === 'daily' ? 'scale-110 drop-shadow-lg' : ''}`} /> 
             <span>HARIAN</span>
           </button>
           <button 
             onClick={() => setActiveTab('stats')}
-            className={`flex-1 py-3 sm:py-4 px-2 sm:px-4 rounded-xl sm:rounded-2xl text-[11px] sm:text-[13px] font-black transition-all duration-300 flex items-center justify-center gap-1 sm:gap-2 min-h-[44px] relative z-10 ${
+            className={`flex-1 py-3.5 sm:py-4 px-3 sm:px-4 rounded-xl sm:rounded-2xl text-[12px] sm:text-[13px] font-black transition-all duration-300 flex items-center justify-center gap-2 sm:gap-2.5 min-h-[48px] relative z-10 ${
               activeTab === 'stats' 
-                ? 'text-white transform scale-105' 
-                : 'text-slate-900 hover:text-teal-800 active:scale-95'
+                ? 'text-white transform scale-[1.02]' 
+                : 'text-slate-700 hover:text-teal-700 active:scale-95'
             }`}
           >
-            <TrendingUp className={`w-3.5 h-3.5 sm:w-4 sm:h-4 transition-all ${activeTab === 'stats' ? 'scale-110' : ''}`} /> 
+            <TrendingUp className={`w-4 h-4 sm:w-5 sm:h-5 transition-all ${activeTab === 'stats' ? 'scale-110 drop-shadow-lg' : ''}`} /> 
             <span>GRAFIK</span>
           </button>
           <button 
             onClick={() => setActiveTab('emergency')}
-            className={`flex-1 py-3 sm:py-4 px-2 sm:px-4 rounded-xl sm:rounded-2xl text-[11px] sm:text-[13px] font-black transition-all duration-300 flex items-center justify-center gap-1 sm:gap-2 min-h-[44px] relative z-10 ${
+            className={`flex-1 py-3.5 sm:py-4 px-3 sm:px-4 rounded-xl sm:rounded-2xl text-[12px] sm:text-[13px] font-black transition-all duration-300 flex items-center justify-center gap-2 sm:gap-2.5 min-h-[48px] relative z-10 ${
               activeTab === 'emergency' 
-                ? 'text-white transform scale-105' 
-                : 'text-slate-900 hover:text-red-600 active:scale-95'
+                ? 'text-white transform scale-[1.02] bg-gradient-to-r from-red-600 to-red-500 rounded-xl sm:rounded-2xl' 
+                : 'text-slate-700 hover:text-red-600 active:scale-95'
             }`}
           >
-            <AlertTriangle className={`w-3.5 h-3.5 sm:w-4 sm:h-4 transition-all ${activeTab === 'emergency' ? 'scale-110' : ''}`} /> 
+            <AlertTriangle className={`w-4 h-4 sm:w-5 sm:h-5 transition-all ${activeTab === 'emergency' ? 'scale-110 drop-shadow-lg' : ''}`} /> 
             <span>BONCOS</span>
           </button>
         </div>
@@ -389,26 +389,47 @@ const App: React.FC = () => {
                   } 
                 />
                 <div className="space-y-3 sm:space-y-4">
-                  {habits.map(habit => (
-                    <Card key={habit.id} className={`transition-all duration-300 ${todayProgress.completedHabitIds.includes(habit.id) ? 'bg-slate-100 border-slate-300 opacity-80 shadow-none' : 'bg-white border-slate-200 shadow-lg hover:shadow-xl hover:border-teal-300'}`}>
+                  {habits.map(habit => {
+                    const isCompleted = todayProgress.completedHabitIds.includes(habit.id);
+                    return (
+                    <Card key={habit.id} className={`group transition-all duration-500 ease-out ${
+                      isCompleted 
+                        ? 'bg-gradient-to-br from-teal-50 to-teal-100/50 border-2 border-teal-300/60 shadow-md' 
+                        : 'bg-white border-2 border-slate-200 shadow-lg hover:shadow-2xl hover:border-teal-400 hover:-translate-y-0.5'
+                    }`}>
                       <div className="p-4 sm:p-5">
-                        <div className="flex items-center gap-3 sm:gap-5">
+                        <div className="flex items-center gap-4 sm:gap-5">
                           <button 
                             onClick={() => toggleHabit(habit.id)}
-                            className="shrink-0 transition-all duration-200 active:scale-75 min-w-[44px] min-h-[44px] flex items-center justify-center hover:scale-110"
+                            className={`shrink-0 transition-all duration-300 ease-out active:scale-90 min-w-[52px] min-h-[52px] sm:min-w-[56px] sm:min-h-[56px] flex items-center justify-center rounded-2xl ${
+                              isCompleted 
+                                ? 'bg-gradient-to-br from-teal-600 to-teal-700 shadow-lg shadow-teal-500/50 scale-110' 
+                                : 'bg-gradient-to-br from-slate-100 to-slate-200 hover:from-teal-100 hover:to-teal-200 shadow-inner hover:scale-110'
+                            }`}
                           >
-                            {todayProgress.completedHabitIds.includes(habit.id) ? (
-                              <CheckCircle className="w-10 h-10 sm:w-11 sm:h-11 text-teal-800 fill-teal-50 animate-in fade-in zoom-in duration-200" />
+                            {isCompleted ? (
+                              <CheckCircle className="w-7 h-7 sm:w-8 sm:h-8 text-white fill-white stroke-2 drop-shadow-lg animate-in zoom-in duration-300" />
                             ) : (
-                              <Circle className="w-10 h-10 sm:w-11 sm:h-11 text-slate-400 stroke-[2.5px] hover:text-teal-600 transition-colors" />
+                              <Circle className="w-7 h-7 sm:w-8 sm:h-8 text-slate-500 stroke-[3px] group-hover:text-teal-600 transition-colors" />
                             )}
                           </button>
-                          <div className="flex-1 cursor-pointer min-w-0" onClick={() => setExpandedHabitId(expandedHabitId === habit.id ? null : habit.id)}>
-                            <h4 className={`font-black text-slate-950 text-[15px] sm:text-[16px] leading-tight tracking-tight ${todayProgress.completedHabitIds.includes(habit.id) ? 'line-through text-slate-600' : ''}`}>
+                          <div 
+                            className="flex-1 cursor-pointer min-w-0" 
+                            onClick={() => setExpandedHabitId(expandedHabitId === habit.id ? null : habit.id)}
+                          >
+                            <h4 className={`font-black text-[16px] sm:text-[17px] leading-tight tracking-tight transition-all duration-300 ${
+                              isCompleted 
+                                ? 'line-through text-slate-500 decoration-2 decoration-teal-600' 
+                                : 'text-slate-950 group-hover:text-teal-900'
+                            }`}>
                               {habit.title}
                             </h4>
                             {habit.description && (
-                              <p className={`text-[11px] sm:text-[12px] mt-1 sm:mt-1.5 font-black leading-relaxed ${todayProgress.completedHabitIds.includes(habit.id) ? 'text-slate-500' : 'text-slate-800'}`}>
+                              <p className={`text-[12px] sm:text-[13px] mt-1.5 sm:mt-2 font-semibold leading-relaxed transition-colors ${
+                                isCompleted 
+                                  ? 'text-slate-400' 
+                                  : 'text-slate-700 group-hover:text-slate-900'
+                              }`}>
                                 {habit.description}
                               </p>
                             )}
@@ -416,36 +437,45 @@ const App: React.FC = () => {
                           {(habit.prayer || habit.description) && (
                             <button 
                               onClick={() => setExpandedHabitId(expandedHabitId === habit.id ? null : habit.id)}
-                              className="p-2 sm:p-2.5 text-slate-950 bg-slate-100 rounded-xl sm:rounded-2xl hover:bg-slate-200 active:bg-slate-200 border-2 border-slate-200 transition-colors shrink-0 min-w-[44px] min-h-[44px] flex items-center justify-center"
+                              className={`p-2.5 sm:p-3 rounded-xl sm:rounded-2xl transition-all duration-300 shrink-0 min-w-[44px] min-h-[44px] flex items-center justify-center ${
+                                expandedHabitId === habit.id
+                                  ? 'bg-teal-100 text-teal-900 border-2 border-teal-300 shadow-inner'
+                                  : 'bg-slate-50 text-slate-600 border-2 border-slate-200 hover:bg-teal-50 hover:text-teal-700 hover:border-teal-300 active:scale-95'
+                              }`}
                             >
-                              {expandedHabitId === habit.id ? <ChevronDown className="w-4 h-4 sm:w-5 sm:h-5" /> : <ChevronRight className="w-4 h-4 sm:w-5 sm:h-5" />}
+                              {expandedHabitId === habit.id ? (
+                                <ChevronDown className="w-5 h-5 sm:w-6 sm:h-6 transition-transform duration-300" />
+                              ) : (
+                                <ChevronRight className="w-5 h-5 sm:w-6 sm:h-6 transition-transform duration-300 group-hover:translate-x-1" />
+                              )}
                             </button>
                           )}
                         </div>
 
                         {expandedHabitId === habit.id && habit.prayer && (
-                          <div className="mt-4 sm:mt-5 p-4 sm:p-6 prayer-card rounded-[1.5rem] sm:rounded-[2rem] text-white shadow-2xl border-4 border-teal-900/40">
-                            <div className="text-right text-2xl sm:text-3xl font-serif mb-4 sm:mb-6 leading-relaxed tracking-wider drop-shadow-lg">
+                          <div className="mt-5 sm:mt-6 p-5 sm:p-7 bg-gradient-to-br from-teal-900 via-teal-800 to-teal-900 rounded-2xl sm:rounded-3xl text-white shadow-2xl border-2 border-teal-700/50 backdrop-blur-sm animate-in slide-in-from-top-2 duration-300">
+                            <div className="text-right text-2xl sm:text-3xl font-serif mb-5 sm:mb-6 leading-relaxed tracking-wider drop-shadow-2xl">
                               {habit.prayer.arabic}
                             </div>
                             {habit.prayer.latin && (
-                              <p className="text-[11px] sm:text-[12px] italic text-teal-50 mb-4 sm:mb-5 font-black border-b border-white/20 pb-3 sm:pb-4 leading-relaxed tracking-tight">
+                              <p className="text-[12px] sm:text-[13px] italic text-teal-100 mb-4 sm:mb-5 font-semibold border-b border-white/30 pb-4 sm:pb-5 leading-relaxed tracking-wide">
                                 {habit.prayer.latin}
                               </p>
                             )}
-                            <p className="text-xs sm:text-sm font-black text-white leading-relaxed">
+                            <p className="text-sm sm:text-base font-bold text-white leading-relaxed">
                               "{habit.prayer.translation}"
                             </p>
                             {habit.prayer.context && (
-                              <div className="mt-4 sm:mt-6 pt-3 sm:pt-4 border-t border-white/20 text-[10px] sm:text-[11px] text-teal-300 uppercase tracking-[0.15em] sm:tracking-[0.2em] font-black flex items-center gap-2">
-                                <Info className="w-3.5 h-3.5 sm:w-4 sm:h-4 shrink-0" /> <span>{habit.prayer.context}</span>
+                              <div className="mt-5 sm:mt-6 pt-4 sm:pt-5 border-t border-white/30 text-[11px] sm:text-[12px] text-teal-200 uppercase tracking-wider font-black flex items-center gap-2">
+                                <Info className="w-4 h-4 sm:w-5 sm:h-5 shrink-0" /> <span>{habit.prayer.context}</span>
                               </div>
                             )}
                           </div>
                         )}
                       </div>
                     </Card>
-                  ))}
+                    );
+                  })}
                 </div>
               </div>
             ))}
