@@ -20,9 +20,8 @@ import { HABITS, MINGGUAN, EMERGENCY } from './constants';
 import { Habit, HabitCategory, DailyProgress, AppState } from './types';
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 import Login from './components/Login';
-import FirebaseSetupError from './components/FirebaseSetupError';
 import { onAuthChange, signOutUser, getCurrentUser } from './services/authService';
-import { getUserData, saveUserData, subscribeToUserData, migrateFromLocalStorage } from './services/firestoreService';
+import { getUserData, saveUserData, subscribeToUserData, migrateFromLocalStorage } from './services/storageService';
 
 // Helper components
 const Card: React.FC<{ children: React.ReactNode, className?: string }> = ({ children, className = "" }) => (
@@ -66,46 +65,31 @@ const App: React.FC = () => {
   const [expandedHabitId, setExpandedHabitId] = useState<string | null>(null);
   const [isSaving, setIsSaving] = useState(false);
 
-  // Check Firebase config
-  const isFirebaseConfigured = useMemo(() => {
-    const apiKey = import.meta.env.VITE_FIREBASE_API_KEY;
-    const projectId = import.meta.env.VITE_FIREBASE_PROJECT_ID;
-    return !!(apiKey && projectId && apiKey !== '' && projectId !== '');
-  }, []);
-
-  // Check authentication
+  // Check authentication and load data
   useEffect(() => {
-    let unsubscribeFirestore: (() => void) | null = null;
-
-    if (!isFirebaseConfigured) {
-      setLoading(false);
-      return;
-    }
+    let unsubscribeStorage: (() => void) | null = null;
 
     const unsubscribe = onAuthChange(async (currentUser) => {
       setUser(currentUser);
       
       if (currentUser) {
-        // Load data from Firestore
+        // Load data from localStorage
         try {
-          // Try to migrate from localStorage first (one-time)
           await migrateFromLocalStorage();
           
-          // Load from Firestore
-          const firestoreData = await getUserData();
-          if (firestoreData) {
-            setState(firestoreData);
+          const userData = await getUserData();
+          if (userData) {
+            setState(userData);
           }
 
-          // Subscribe to real-time updates
-          unsubscribeFirestore = subscribeToUserData((updatedState) => {
+          // Subscribe to data changes
+          unsubscribeStorage = subscribeToUserData((updatedState) => {
             if (updatedState) {
               setState(updatedState);
             }
           });
         } catch (error) {
           console.error('Error loading data:', error);
-          // Don't block the app if there's an error loading data
         }
       }
       
@@ -114,13 +98,13 @@ const App: React.FC = () => {
 
     return () => {
       unsubscribe();
-      if (unsubscribeFirestore) {
-        unsubscribeFirestore();
+      if (unsubscribeStorage) {
+        unsubscribeStorage();
       }
     };
-  }, [isFirebaseConfigured]);
+  }, []);
 
-  // Save to Firestore when state changes (debounced)
+  // Save to localStorage when state changes (debounced)
   useEffect(() => {
     if (!user) return;
 
@@ -229,10 +213,6 @@ const App: React.FC = () => {
   };
 
   // Early returns after all hooks
-  if (!isFirebaseConfigured) {
-    return <FirebaseSetupError />;
-  }
-
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-teal-900">
