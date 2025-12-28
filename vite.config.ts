@@ -9,7 +9,12 @@ export default defineConfig(({ mode }) => {
         port: 3000,
         host: '0.0.0.0',
       },
-      plugins: [react()],
+      plugins: [
+        react({
+          // Fix for React 19 production build issues
+          jsxRuntime: 'automatic',
+        })
+      ],
       define: {
         'process.env.API_KEY': JSON.stringify(env.GEMINI_API_KEY),
         'process.env.GEMINI_API_KEY': JSON.stringify(env.GEMINI_API_KEY)
@@ -26,7 +31,7 @@ export default defineConfig(({ mode }) => {
         rollupOptions: {
           output: {
             manualChunks: (id) => {
-              // React vendor
+              // React vendor - keep React and ReactDOM together
               if (id.includes('node_modules/react') || id.includes('node_modules/react-dom')) {
                 return 'react-vendor';
               }
@@ -46,6 +51,11 @@ export default defineConfig(({ mode }) => {
               if (id.includes('node_modules')) {
                 return 'vendor';
               }
+            },
+            // Fix for React 19 production build
+            format: 'es',
+            generatedCode: {
+              constBindings: true
             }
           }
         },
@@ -54,6 +64,12 @@ export default defineConfig(({ mode }) => {
         // Ensure consistent build output
         commonjsOptions: {
           include: [/node_modules/]
+        },
+        // Target modern browsers for better compatibility
+        target: 'esnext',
+        // Fix for React 19
+        modulePreload: {
+          polyfill: false
         }
       }
     };
