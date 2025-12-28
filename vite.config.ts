@@ -50,7 +50,11 @@ export default defineConfig(({ mode }) => {
           }
         },
         chunkSizeWarningLimit: 300,
-        reportCompressedSize: false // Faster builds
+        reportCompressedSize: false, // Faster builds
+        // Ensure consistent build output
+        commonjsOptions: {
+          include: [/node_modules/]
+        }
       }
     };
 });

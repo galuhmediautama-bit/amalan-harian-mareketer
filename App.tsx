@@ -114,43 +114,50 @@ const App: React.FC = () => {
     const unsubscribe = onAuthChange(async (currentUser) => {
       if (!mounted) return;
       
-      setUser(currentUser);
-      
-      if (currentUser) {
-        // Load data from Supabase
-        try {
-          await migrateFromLocalStorage();
-          
-          const userData = await getUserData();
-          if (userData && mounted) {
-            setState(userData);
-          }
+      try {
+        setUser(currentUser);
+        
+        if (currentUser) {
+          // Load data from Supabase
+          try {
+            await migrateFromLocalStorage();
+            
+            const userData = await getUserData();
+            if (userData && mounted) {
+              setState(userData);
+            }
 
-          // Subscribe to real-time data changes
-          if (mounted) {
-            unsubscribeStorage = subscribeToUserData((updatedState) => {
-              if (updatedState && mounted) {
-                setState(updatedState);
-              }
-            });
+            // Subscribe to real-time data changes
+            if (mounted) {
+              unsubscribeStorage = subscribeToUserData((updatedState) => {
+                if (updatedState && mounted) {
+                  setState(updatedState);
+                }
+              });
+            }
+          } catch (error) {
+            console.error('Error loading data:', error);
+            // Don't crash the app, just log the error
+            // User can still use the app with default state
           }
-        } catch (error) {
-          console.error('Error loading data:', error);
+        } else {
+          // Clear state when user logs out
+          setState({
+            currentDate: new Date().toISOString().split('T')[0],
+            progress: {}
+          });
+          setPartnership(null);
+          setPendingInvitations({ sent: [], received: [] });
+          setPartnerProgress(null);
+          setMessages([]);
         }
-      } else {
-        // Clear state when user logs out
-        setState({
-          currentDate: new Date().toISOString().split('T')[0],
-          progress: {}
-        });
-        setPartnership(null);
-        setPendingInvitations({ sent: [], received: [] });
-        setPartnerProgress(null);
-        setMessages([]);
-      }
-      
-      if (mounted) {
-        setLoading(false);
+      } catch (error) {
+        console.error('Error in onAuthChange:', error);
+        // Ensure loading is set to false even on error
+      } finally {
+        if (mounted) {
+          setLoading(false);
+        }
       }
     });
 
@@ -391,8 +398,11 @@ const App: React.FC = () => {
   // Early returns after all hooks
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-teal-900">
-        <div className="text-white text-xl font-black">Loading...</div>
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-teal-900 via-teal-800 to-teal-900">
+        <div className="text-center">
+          <div className="inline-block animate-spin rounded-full h-12 w-12 border-4 border-white border-t-transparent mb-4"></div>
+          <div className="text-white text-xl font-black">Loading...</div>
+        </div>
       </div>
     );
   }
