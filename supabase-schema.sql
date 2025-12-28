@@ -1,6 +1,15 @@
--- Supabase Database Schema untuk Marketer Berkah
+-- ============================================
+-- SUPABASE DATABASE SCHEMA
+-- Aplikasi: Marketer Berkah - Amalan Harian
+-- Version: 2.0
+-- Updated: 2025-12-28
+-- ============================================
 
--- Table untuk menyimpan progress user
+-- ============================================
+-- 1. TABLE: user_progress
+-- Menyimpan progress amalan harian user
+-- ============================================
+
 CREATE TABLE IF NOT EXISTS user_progress (
   id BIGSERIAL PRIMARY KEY,
   user_id UUID NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
@@ -18,58 +27,56 @@ CREATE INDEX IF NOT EXISTS idx_user_progress_updated_at ON user_progress(updated
 -- Enable Row Level Security (RLS)
 ALTER TABLE user_progress ENABLE ROW LEVEL SECURITY;
 
--- Policy: User hanya bisa akses data miliknya sendiri
--- Drop existing policies first (if they exist)
+-- Drop existing policies first
 DROP POLICY IF EXISTS "Users can view own progress" ON user_progress;
 DROP POLICY IF EXISTS "Users can insert own progress" ON user_progress;
 DROP POLICY IF EXISTS "Users can update own progress" ON user_progress;
 DROP POLICY IF EXISTS "Users can delete own progress" ON user_progress;
-DROP POLICY IF EXISTS "Partners can view each other's progress via RPC" ON user_progress;
+DROP POLICY IF EXISTS "Users can view partner progress" ON user_progress;
 
--- Create policies
+-- Policies untuk user_progress
 CREATE POLICY "Users can view own progress"
-  ON user_progress
-  FOR SELECT
+  ON user_progress FOR SELECT
   USING (auth.uid() = user_id);
 
 CREATE POLICY "Users can insert own progress"
-  ON user_progress
-  FOR INSERT
+  ON user_progress FOR INSERT
   WITH CHECK (auth.uid() = user_id);
 
 CREATE POLICY "Users can update own progress"
-  ON user_progress
-  FOR UPDATE
+  ON user_progress FOR UPDATE
   USING (auth.uid() = user_id)
   WITH CHECK (auth.uid() = user_id);
 
 CREATE POLICY "Users can delete own progress"
-  ON user_progress
-  FOR DELETE
+  ON user_progress FOR DELETE
   USING (auth.uid() = user_id);
 
--- Function untuk auto-update updated_at
-CREATE OR REPLACE FUNCTION update_updated_at_column()
-RETURNS TRIGGER AS $$
-BEGIN
-  NEW.updated_at = NOW();
-  RETURN NEW;
-END;
-$$ LANGUAGE plpgsql;
+-- Policy: Partner bisa melihat progress partner
+CREATE POLICY "Users can view partner progress"
+  ON user_progress FOR SELECT
+  USING (
+    auth.uid() = user_id OR
+    EXISTS (
+      SELECT 1 FROM partnerships
+      WHERE (
+        (user1_id = auth.uid() AND user2_id = user_progress.user_id) OR
+        (user1_id = user_progress.user_id AND user2_id = auth.uid())
+      )
+      AND status = 'accepted'
+    )
+  );
 
--- Trigger untuk auto-update updated_at
-DROP TRIGGER IF EXISTS update_user_progress_updated_at ON user_progress;
-CREATE TRIGGER update_user_progress_updated_at
-  BEFORE UPDATE ON user_progress
-  FOR EACH ROW
-  EXECUTE FUNCTION update_updated_at_column();
+-- ============================================
+-- 2. TABLE: partnerships
+-- Relasi kemitraan antar user
+-- ============================================
 
--- Table untuk partnerships (partner relationships)
 CREATE TABLE IF NOT EXISTS partnerships (
   id BIGSERIAL PRIMARY KEY,
   user1_id UUID NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
   user2_id UUID NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
-  status TEXT NOT NULL DEFAULT 'pending', -- pending, accepted, rejected
+  status TEXT NOT NULL DEFAULT 'pending' CHECK (status IN ('pending', 'accepted', 'rejected')),
   invited_by UUID NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
   created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
   updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
@@ -81,42 +88,40 @@ CREATE TABLE IF NOT EXISTS partnerships (
 CREATE INDEX IF NOT EXISTS idx_partnerships_user1 ON partnerships(user1_id);
 CREATE INDEX IF NOT EXISTS idx_partnerships_user2 ON partnerships(user2_id);
 CREATE INDEX IF NOT EXISTS idx_partnerships_status ON partnerships(status);
+CREATE INDEX IF NOT EXISTS idx_partnerships_invited_by ON partnerships(invited_by);
 
 -- Enable RLS untuk partnerships
 ALTER TABLE partnerships ENABLE ROW LEVEL SECURITY;
 
--- Drop existing policies first (if they exist)
+-- Drop existing policies first
 DROP POLICY IF EXISTS "Users can view own partnerships" ON partnerships;
 DROP POLICY IF EXISTS "Users can create partnerships" ON partnerships;
 DROP POLICY IF EXISTS "Users can update own partnerships" ON partnerships;
+DROP POLICY IF EXISTS "Users can delete own partnerships" ON partnerships;
 
--- Policy: Users can view partnerships they're involved in
+-- Policies untuk partnerships
 CREATE POLICY "Users can view own partnerships"
-  ON partnerships
-  FOR SELECT
+  ON partnerships FOR SELECT
   USING (auth.uid() = user1_id OR auth.uid() = user2_id);
 
--- Policy: Users can create partnerships
 CREATE POLICY "Users can create partnerships"
-  ON partnerships
-  FOR INSERT
-  WITH CHECK (auth.uid() = user1_id OR auth.uid() = user2_id);
+  ON partnerships FOR INSERT
+  WITH CHECK (auth.uid() = invited_by);
 
--- Policy: Users can update partnerships they're involved in
 CREATE POLICY "Users can update own partnerships"
-  ON partnerships
-  FOR UPDATE
+  ON partnerships FOR UPDATE
   USING (auth.uid() = user1_id OR auth.uid() = user2_id)
   WITH CHECK (auth.uid() = user1_id OR auth.uid() = user2_id);
 
--- Trigger untuk auto-update updated_at pada partnerships
-DROP TRIGGER IF EXISTS update_partnerships_updated_at ON partnerships;
-CREATE TRIGGER update_partnerships_updated_at
-  BEFORE UPDATE ON partnerships
-  FOR EACH ROW
-  EXECUTE FUNCTION update_updated_at_column();
+CREATE POLICY "Users can delete own partnerships"
+  ON partnerships FOR DELETE
+  USING (auth.uid() = user1_id OR auth.uid() = user2_id);
 
--- Table untuk messages (pesan motivasi antar partner)
+-- ============================================
+-- 3. TABLE: messages
+-- Pesan motivasi antar partner
+-- ============================================
+
 CREATE TABLE IF NOT EXISTS messages (
   id BIGSERIAL PRIMARY KEY,
   sender_id UUID NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
@@ -131,35 +136,77 @@ CREATE TABLE IF NOT EXISTS messages (
 CREATE INDEX IF NOT EXISTS idx_messages_sender ON messages(sender_id);
 CREATE INDEX IF NOT EXISTS idx_messages_receiver ON messages(receiver_id);
 CREATE INDEX IF NOT EXISTS idx_messages_created_at ON messages(created_at DESC);
+CREATE INDEX IF NOT EXISTS idx_messages_conversation ON messages(sender_id, receiver_id);
 
 -- Enable RLS untuk messages
 ALTER TABLE messages ENABLE ROW LEVEL SECURITY;
 
--- Drop existing policies first (if they exist)
+-- Drop existing policies first
 DROP POLICY IF EXISTS "Users can view own messages" ON messages;
 DROP POLICY IF EXISTS "Users can send messages" ON messages;
 DROP POLICY IF EXISTS "Users can update received messages" ON messages;
+DROP POLICY IF EXISTS "Users can delete own messages" ON messages;
 
--- Policy: Users can view messages they sent or received
+-- Policies untuk messages
 CREATE POLICY "Users can view own messages"
-  ON messages
-  FOR SELECT
+  ON messages FOR SELECT
   USING (auth.uid() = sender_id OR auth.uid() = receiver_id);
 
--- Policy: Users can send messages
 CREATE POLICY "Users can send messages"
-  ON messages
-  FOR INSERT
-  WITH CHECK (auth.uid() = sender_id);
+  ON messages FOR INSERT
+  WITH CHECK (
+    auth.uid() = sender_id AND
+    EXISTS (
+      SELECT 1 FROM partnerships
+      WHERE (
+        (user1_id = auth.uid() AND user2_id = messages.receiver_id) OR
+        (user1_id = messages.receiver_id AND user2_id = auth.uid())
+      )
+      AND status = 'accepted'
+    )
+  );
 
--- Policy: Users can update messages they received (mark as read)
 CREATE POLICY "Users can update received messages"
-  ON messages
-  FOR UPDATE
+  ON messages FOR UPDATE
   USING (auth.uid() = receiver_id)
   WITH CHECK (auth.uid() = receiver_id);
 
--- Function to get partner progress (allows viewing partner's data if partnership exists)
+CREATE POLICY "Users can delete own messages"
+  ON messages FOR DELETE
+  USING (auth.uid() = sender_id OR auth.uid() = receiver_id);
+
+-- ============================================
+-- 4. FUNCTIONS & TRIGGERS
+-- ============================================
+
+-- Function untuk auto-update updated_at
+CREATE OR REPLACE FUNCTION update_updated_at_column()
+RETURNS TRIGGER AS $$
+BEGIN
+  NEW.updated_at = NOW();
+  RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+-- Trigger untuk user_progress
+DROP TRIGGER IF EXISTS update_user_progress_updated_at ON user_progress;
+CREATE TRIGGER update_user_progress_updated_at
+  BEFORE UPDATE ON user_progress
+  FOR EACH ROW
+  EXECUTE FUNCTION update_updated_at_column();
+
+-- Trigger untuk partnerships
+DROP TRIGGER IF EXISTS update_partnerships_updated_at ON partnerships;
+CREATE TRIGGER update_partnerships_updated_at
+  BEFORE UPDATE ON partnerships
+  FOR EACH ROW
+  EXECUTE FUNCTION update_updated_at_column();
+
+-- ============================================
+-- 5. RPC FUNCTIONS
+-- ============================================
+
+-- Function: Get partner progress
 CREATE OR REPLACE FUNCTION get_partner_progress(partner_user_id UUID)
 RETURNS TABLE (
   current_date_value TEXT,
@@ -185,23 +232,81 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql SECURITY DEFINER;
 
--- Alternative: RLS policy to allow viewing partner's progress
--- This allows partners to see each other's progress
--- Drop existing policy first (if it exists)
-DROP POLICY IF EXISTS "Users can view partner progress" ON user_progress;
+-- Function: Get user stats (summary)
+CREATE OR REPLACE FUNCTION get_user_stats(target_user_id UUID DEFAULT NULL)
+RETURNS TABLE (
+  total_days INTEGER,
+  total_completed_habits BIGINT,
+  avg_completion_percentage NUMERIC
+) AS $$
+DECLARE
+  uid UUID;
+BEGIN
+  uid := COALESCE(target_user_id, auth.uid());
+  
+  RETURN QUERY
+  SELECT 
+    (SELECT COUNT(DISTINCT key)::INTEGER 
+     FROM user_progress up, jsonb_each(up.progress) 
+     WHERE up.user_id = uid) as total_days,
+    (SELECT COALESCE(SUM(jsonb_array_length(value->'completedHabitIds')), 0)::BIGINT
+     FROM user_progress up, jsonb_each(up.progress)
+     WHERE up.user_id = uid) as total_completed_habits,
+    (SELECT COALESCE(AVG(jsonb_array_length(value->'completedHabitIds')::NUMERIC / 15 * 100), 0)
+     FROM user_progress up, jsonb_each(up.progress)
+     WHERE up.user_id = uid) as avg_completion_percentage;
+END;
+$$ LANGUAGE plpgsql SECURITY DEFINER;
 
-CREATE POLICY "Users can view partner progress"
-  ON user_progress
-  FOR SELECT
-  USING (
-    auth.uid() = user_id OR
-    EXISTS (
-      SELECT 1 FROM partnerships
-      WHERE (
-        (user1_id = auth.uid() AND user2_id = user_progress.user_id) OR
-        (user1_id = user_progress.user_id AND user2_id = auth.uid())
-      )
-      AND status = 'accepted'
-    )
-  );
+-- Function: Search user by email (for partnership invitation)
+CREATE OR REPLACE FUNCTION search_user_by_email(search_email TEXT)
+RETURNS TABLE (
+  user_id UUID,
+  email TEXT,
+  display_name TEXT
+) AS $$
+BEGIN
+  RETURN QUERY
+  SELECT 
+    au.id as user_id,
+    au.email::TEXT as email,
+    COALESCE(au.raw_user_meta_data->>'name', au.email)::TEXT as display_name
+  FROM auth.users au
+  WHERE au.email = search_email
+  AND au.id != auth.uid();
+END;
+$$ LANGUAGE plpgsql SECURITY DEFINER;
 
+-- ============================================
+-- 6. REALTIME SUBSCRIPTIONS
+-- Enable realtime for tables
+-- ============================================
+
+-- Enable realtime for user_progress
+ALTER PUBLICATION supabase_realtime ADD TABLE user_progress;
+
+-- Enable realtime for partnerships
+ALTER PUBLICATION supabase_realtime ADD TABLE partnerships;
+
+-- Enable realtime for messages
+ALTER PUBLICATION supabase_realtime ADD TABLE messages;
+
+-- ============================================
+-- PANDUAN PENGGUNAAN
+-- ============================================
+-- 
+-- 1. Buka Supabase Dashboard
+-- 2. Pergi ke SQL Editor
+-- 3. Copy seluruh isi file ini
+-- 4. Paste dan klik "Run"
+-- 
+-- Jika ada error "already exists":
+-- - Ini normal jika tabel/policy sudah ada
+-- - Script ini sudah menghandle dengan DROP IF EXISTS
+-- 
+-- Untuk reset total (HATI-HATI - DATA HILANG):
+-- DROP TABLE IF EXISTS messages CASCADE;
+-- DROP TABLE IF EXISTS partnerships CASCADE;
+-- DROP TABLE IF EXISTS user_progress CASCADE;
+-- Lalu jalankan script ini lagi
+-- ============================================
