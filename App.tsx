@@ -11,6 +11,7 @@ import {
   AlertTriangle,
   ChevronRight,
   ChevronDown,
+  ChevronLeft,
   Info,
   Star,
   Moon,
@@ -18,7 +19,8 @@ import {
   Users,
   UserPlus,
   MessageCircle,
-  Trophy
+  Trophy,
+  X
 } from 'lucide-react';
 import { HABITS, MINGGUAN, EMERGENCY } from './constants';
 import { Habit, HabitCategory, DailyProgress, AppState } from './types';
@@ -96,6 +98,11 @@ const App: React.FC = () => {
   const [expandedHabitId, setExpandedHabitId] = useState<string | null>(null);
   const [isSaving, setIsSaving] = useState(false);
   const [currentPrinsipIndex, setCurrentPrinsipIndex] = useState(0);
+  
+  // Date selection state
+  const [selectedDate, setSelectedDate] = useState<string>(new Date().toISOString().split('T')[0]);
+  const [showDatePicker, setShowDatePicker] = useState(false);
+  const actualToday = new Date().toISOString().split('T')[0];
   
   // Partnership state
   const [partnership, setPartnership] = useState<Partnership | null>(null);
@@ -289,12 +296,67 @@ const App: React.FC = () => {
   }, [user, partnership, activeTab]);
 
   // All hooks must be called before early returns
-  const today = state.currentDate;
+  // Use selectedDate instead of currentDate to allow viewing past dates
+  const today = selectedDate;
+  const isViewingPastDate = selectedDate !== actualToday;
   const todayProgress = state.progress[today] || {
     date: today,
     completedHabitIds: [],
     muhasabah: { jujur: true, followUp: true, hakOrang: true, dosaDigital: false }
   };
+
+  // Date navigation functions
+  const goToPreviousDay = () => {
+    const current = new Date(selectedDate);
+    current.setDate(current.getDate() - 1);
+    // Limit to 30 days in the past
+    const thirtyDaysAgo = new Date();
+    thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+    if (current >= thirtyDaysAgo) {
+      setSelectedDate(current.toISOString().split('T')[0]);
+    }
+  };
+
+  const goToNextDay = () => {
+    const current = new Date(selectedDate);
+    current.setDate(current.getDate() + 1);
+    const todayDate = new Date(actualToday);
+    // Cannot go to future dates
+    if (current <= todayDate) {
+      setSelectedDate(current.toISOString().split('T')[0]);
+    }
+  };
+
+  const goToToday = () => {
+    setSelectedDate(actualToday);
+  };
+
+  // Format date for display
+  const formatDateDisplay = (dateStr: string) => {
+    const date = new Date(dateStr);
+    const options: Intl.DateTimeFormatOptions = { weekday: 'long', day: 'numeric', month: 'short' };
+    return date.toLocaleDateString('id-ID', options);
+  };
+
+  // Get days for date picker (last 30 days)
+  const datePickerDays = useMemo(() => {
+    const days = [];
+    for (let i = 0; i < 30; i++) {
+      const date = new Date();
+      date.setDate(date.getDate() - i);
+      const dateStr = date.toISOString().split('T')[0];
+      const hasData = state.progress[dateStr] && state.progress[dateStr].completedHabitIds.length > 0;
+      days.push({
+        date: dateStr,
+        dayName: date.toLocaleDateString('id-ID', { weekday: 'short' }),
+        dayNum: date.getDate(),
+        monthName: date.toLocaleDateString('id-ID', { month: 'short' }),
+        hasData,
+        isToday: dateStr === actualToday
+      });
+    }
+    return days;
+  }, [state.progress, actualToday]);
 
   const groupedHabits = useMemo(() => {
     const groups: Record<HabitCategory, Habit[]> = {} as any;
@@ -427,9 +489,13 @@ const App: React.FC = () => {
               </p>
             </div>
             <div className="flex items-center gap-1.5">
-              <div className="bg-white/10 backdrop-blur-sm p-2 rounded-lg border border-white/20 shadow-lg shrink-0 hover:bg-white/20 transition-colors" title="Kalender">
+              <button 
+                onClick={() => setShowDatePicker(true)}
+                className="bg-white/10 backdrop-blur-sm p-2 rounded-lg border border-white/20 shadow-lg shrink-0 hover:bg-white/20 transition-colors active:scale-95" 
+                title="Pilih Tanggal"
+              >
                 <Calendar className="w-4 h-4 text-white" />
-              </div>
+              </button>
               {isSaving && (
                 <div className="text-[10px] text-teal-200 font-black animate-pulse flex items-center gap-1">
                   <div className="w-1.5 h-1.5 bg-teal-300 rounded-full animate-pulse"></div>
@@ -439,9 +505,60 @@ const App: React.FC = () => {
             </div>
           </div>
 
-          <div className="bg-white/15 backdrop-blur-md p-3 rounded-xl border border-white/30 mt-3 shadow-xl">
+          {/* Date Navigation */}
+          <div className="bg-white/15 backdrop-blur-md p-2 rounded-xl border border-white/30 mt-2 shadow-xl">
+            <div className="flex items-center justify-between gap-2">
+              <button 
+                onClick={goToPreviousDay}
+                className="p-2 rounded-lg bg-white/10 hover:bg-white/20 active:scale-95 transition-all"
+                title="Hari Sebelumnya"
+              >
+                <ChevronLeft className="w-4 h-4 text-white" />
+              </button>
+              
+              <button 
+                onClick={() => setShowDatePicker(true)}
+                className="flex-1 text-center py-1.5 px-3 rounded-lg bg-white/10 hover:bg-white/20 active:scale-95 transition-all"
+              >
+                <div className="text-[11px] font-black text-white uppercase tracking-wide">
+                  {formatDateDisplay(selectedDate)}
+                </div>
+                {isViewingPastDate && (
+                  <div className="text-[9px] font-bold text-yellow-300 mt-0.5">
+                    📅 Melihat hari lalu
+                  </div>
+                )}
+              </button>
+              
+              <button 
+                onClick={goToNextDay}
+                disabled={selectedDate === actualToday}
+                className={`p-2 rounded-lg transition-all ${
+                  selectedDate === actualToday 
+                    ? 'bg-white/5 opacity-50 cursor-not-allowed' 
+                    : 'bg-white/10 hover:bg-white/20 active:scale-95'
+                }`}
+                title="Hari Berikutnya"
+              >
+                <ChevronRight className="w-4 h-4 text-white" />
+              </button>
+            </div>
+            
+            {isViewingPastDate && (
+              <button 
+                onClick={goToToday}
+                className="w-full mt-2 py-1.5 rounded-lg bg-yellow-500/30 hover:bg-yellow-500/40 text-yellow-100 text-[10px] font-black uppercase tracking-wide transition-all active:scale-95"
+              >
+                🔙 Kembali ke Hari Ini
+              </button>
+            )}
+          </div>
+
+          <div className="bg-white/15 backdrop-blur-md p-3 rounded-xl border border-white/30 mt-2 shadow-xl">
             <div className="flex justify-between items-end mb-1.5">
-              <span className="text-[10px] font-black text-white uppercase tracking-wider opacity-90">Progress Hari Ini</span>
+              <span className="text-[10px] font-black text-white uppercase tracking-wider opacity-90">
+                Progress {isViewingPastDate ? formatDateDisplay(selectedDate) : 'Hari Ini'}
+              </span>
               <span className="text-2xl font-black drop-shadow-lg">{completionPercentage}%</span>
             </div>
             <div className="h-3 w-full bg-teal-950/70 rounded-full overflow-hidden border border-white/20 shadow-inner">
@@ -1224,6 +1341,91 @@ const App: React.FC = () => {
           <span className={`text-[9px] font-black uppercase tracking-wider transition-colors ${activeTab === 'emergency' ? 'text-red-950' : 'text-slate-500'}`}>Boncos</span>
         </button>
       </nav>
+
+      {/* Date Picker Modal */}
+      {showDatePicker && (
+        <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
+          <div className="bg-white rounded-2xl shadow-2xl w-full max-w-md max-h-[70vh] overflow-hidden animate-in slide-in-from-bottom duration-300">
+            {/* Header */}
+            <div className="bg-gradient-to-r from-teal-700 to-teal-600 p-4 flex items-center justify-between">
+              <div>
+                <h3 className="text-white font-black text-lg">Pilih Tanggal</h3>
+                <p className="text-teal-100 text-xs font-semibold">30 hari terakhir</p>
+              </div>
+              <button 
+                onClick={() => setShowDatePicker(false)}
+                className="p-2 rounded-lg bg-white/20 hover:bg-white/30 transition-colors"
+              >
+                <X className="w-5 h-5 text-white" />
+              </button>
+            </div>
+            
+            {/* Quick Actions */}
+            <div className="p-3 border-b border-slate-200 bg-slate-50">
+              <button 
+                onClick={() => {
+                  goToToday();
+                  setShowDatePicker(false);
+                }}
+                className={`w-full py-2.5 rounded-xl font-black text-sm transition-all ${
+                  selectedDate === actualToday 
+                    ? 'bg-teal-600 text-white' 
+                    : 'bg-white border-2 border-teal-600 text-teal-700 hover:bg-teal-50'
+                }`}
+              >
+                📅 Hari Ini - {formatDateDisplay(actualToday)}
+              </button>
+            </div>
+            
+            {/* Date Grid */}
+            <div className="p-3 overflow-y-auto max-h-[50vh]">
+              <div className="grid grid-cols-5 gap-2">
+                {datePickerDays.map((day) => (
+                  <button
+                    key={day.date}
+                    onClick={() => {
+                      setSelectedDate(day.date);
+                      setShowDatePicker(false);
+                    }}
+                    className={`p-2 rounded-xl text-center transition-all active:scale-95 ${
+                      day.date === selectedDate
+                        ? 'bg-teal-600 text-white shadow-lg ring-2 ring-teal-300'
+                        : day.isToday
+                        ? 'bg-teal-100 text-teal-900 border-2 border-teal-300'
+                        : day.hasData
+                        ? 'bg-green-50 text-green-900 border border-green-200 hover:bg-green-100'
+                        : 'bg-slate-50 text-slate-700 border border-slate-200 hover:bg-slate-100'
+                    }`}
+                  >
+                    <div className="text-[9px] font-bold uppercase opacity-70">{day.dayName}</div>
+                    <div className="text-lg font-black">{day.dayNum}</div>
+                    <div className="text-[8px] font-bold uppercase opacity-60">{day.monthName}</div>
+                    {day.hasData && !day.isToday && day.date !== selectedDate && (
+                      <div className="w-1.5 h-1.5 bg-green-500 rounded-full mx-auto mt-0.5"></div>
+                    )}
+                  </button>
+                ))}
+              </div>
+              
+              {/* Legend */}
+              <div className="mt-4 pt-3 border-t border-slate-200 flex items-center justify-center gap-4 text-[10px] font-semibold text-slate-600">
+                <div className="flex items-center gap-1">
+                  <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+                  <span>Ada data</span>
+                </div>
+                <div className="flex items-center gap-1">
+                  <div className="w-2 h-2 bg-teal-600 rounded-full"></div>
+                  <span>Dipilih</span>
+                </div>
+                <div className="flex items-center gap-1">
+                  <div className="w-2 h-2 bg-teal-200 rounded-full border border-teal-400"></div>
+                  <span>Hari ini</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
