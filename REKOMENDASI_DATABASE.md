@@ -104,3 +104,4 @@ Tinggal bilang "setup supabase" dan saya akan bantu! 😊
 
 **Kesimpulan: Supabase adalah pilihan terbaik! 🎯**
 
+

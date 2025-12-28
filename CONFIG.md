@@ -25,3 +25,4 @@ VITE_SUPABASE_ANON_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFz
 - File `.env.local` sudah di-ignore oleh `.gitignore` (tidak akan ter-commit)
 - Nilai di atas adalah untuk production dan boleh di-commit ke GitHub (anon key aman untuk public)
 
+

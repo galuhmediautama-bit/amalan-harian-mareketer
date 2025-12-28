@@ -93,3 +93,4 @@ Pastikan RLS sudah diaktifkan dan policies sudah dibuat untuk:
 4. **Streak Comparison**: Tampilkan streak comparison
 5. **Leaderboard**: Ranking berdasarkan total points
 
+

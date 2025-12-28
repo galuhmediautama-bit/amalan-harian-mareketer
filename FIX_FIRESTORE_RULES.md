@@ -68,3 +68,4 @@ Rules di atas berarti:
 
 **Setelah rules di-publish, aplikasi akan bisa mengakses Firestore dengan benar! ✅**
 
+

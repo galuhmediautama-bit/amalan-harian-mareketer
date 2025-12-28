@@ -62,3 +62,4 @@ Setelah deploy ulang:
 
 **Catatan:** Build sudah diperbaiki dengan code splitting yang lebih baik. Deploy ulang setelah update Firestore rules.
 
+

@@ -142,3 +142,4 @@ npm run cap:android
 
 **Selamat! APK sudah siap untuk diinstall di Android device!** 🎉
 
+

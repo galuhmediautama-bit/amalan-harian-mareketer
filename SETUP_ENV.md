@@ -45,3 +45,4 @@ Jika ingin menggunakan GitHub Actions untuk deploy:
 - ❌ **`.env.local`** → JANGAN di-commit (sudah di `.gitignore`)
 - 🔒 **GitHub Secrets** → Untuk GitHub Actions (jika digunakan)
 
+

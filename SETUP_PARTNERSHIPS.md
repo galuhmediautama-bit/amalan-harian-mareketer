@@ -37,3 +37,4 @@ Jalankan SQL schema untuk membuat tabel `partnerships` dan `messages` di Supabas
 2. Pastikan RLS policies sudah aktif
 3. Refresh browser dan coba lagi
 
+
