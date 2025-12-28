@@ -316,6 +316,18 @@ DROP POLICY IF EXISTS "Anyone can view settings" ON app_settings;
 DROP POLICY IF EXISTS "Only admin can update settings" ON app_settings;
 DROP POLICY IF EXISTS "Only admin can insert settings" ON app_settings;
 
+-- Helper function untuk check admin
+CREATE OR REPLACE FUNCTION is_admin_user()
+RETURNS BOOLEAN AS $$
+BEGIN
+  RETURN EXISTS (
+    SELECT 1 FROM auth.users
+    WHERE auth.users.id = auth.uid()
+    AND auth.users.email = 'galuhmediautama@gmail.com'
+  );
+END;
+$$ LANGUAGE plpgsql SECURITY DEFINER;
+
 -- Policies untuk app_settings
 -- Semua user bisa lihat settings (untuk tampilan web)
 CREATE POLICY "Anyone can view settings"
@@ -325,31 +337,13 @@ CREATE POLICY "Anyone can view settings"
 -- Hanya admin yang bisa update settings
 CREATE POLICY "Only admin can update settings"
   ON app_settings FOR UPDATE
-  USING (
-    EXISTS (
-      SELECT 1 FROM auth.users
-      WHERE auth.users.id = auth.uid()
-      AND auth.users.email = 'galuhmediautama@gmail.com'
-    )
-  )
-  WITH CHECK (
-    EXISTS (
-      SELECT 1 FROM auth.users
-      WHERE auth.users.id = auth.uid()
-      AND auth.users.email = 'galuhmediautama@gmail.com'
-    )
-  );
+  USING (is_admin_user())
+  WITH CHECK (is_admin_user());
 
 -- Policy untuk insert (hanya admin)
 CREATE POLICY "Only admin can insert settings"
   ON app_settings FOR INSERT
-  WITH CHECK (
-    EXISTS (
-      SELECT 1 FROM auth.users
-      WHERE auth.users.id = auth.uid()
-      AND auth.users.email = 'galuhmediautama@gmail.com'
-    )
-  );
+  WITH CHECK (is_admin_user());
 
 -- Insert default settings
 INSERT INTO app_settings (setting_key, setting_value) 
