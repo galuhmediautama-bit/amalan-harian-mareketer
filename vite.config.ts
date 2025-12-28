@@ -22,39 +22,9 @@ export default defineConfig(({ mode }) => {
       build: {
         minify: 'esbuild',
         sourcemap: false,
-        cssCodeSplit: true,
-        rollupOptions: {
-          output: {
-            manualChunks: (id) => {
-              // React vendor - keep React and ReactDOM together
-              if (id.includes('node_modules/react') || id.includes('node_modules/react-dom')) {
-                return 'react-vendor';
-              }
-              // Supabase vendor
-              if (id.includes('node_modules/@supabase')) {
-                return 'supabase-vendor';
-              }
-              // Recharts vendor (large library)
-              if (id.includes('node_modules/recharts')) {
-                return 'recharts-vendor';
-              }
-              // Lucide icons
-              if (id.includes('node_modules/lucide-react')) {
-                return 'icons-vendor';
-              }
-              // Other node_modules
-              if (id.includes('node_modules')) {
-                return 'vendor';
-              }
-            }
-          }
-        },
-        chunkSizeWarningLimit: 300,
-        reportCompressedSize: false, // Faster builds
-        // Ensure consistent build output
-        commonjsOptions: {
-          include: [/node_modules/]
-        }
+        // Let Vite handle chunking automatically - manual chunks can cause React loading issues
+        chunkSizeWarningLimit: 1000, // Increase limit since we're not splitting manually
+        reportCompressedSize: false
       }
     };
 });
