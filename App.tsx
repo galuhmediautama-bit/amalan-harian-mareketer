@@ -30,6 +30,7 @@ import { onAuthChange, signOutUser, getCurrentUser } from './services/authServic
 import { getUserData, saveUserData, subscribeToUserData, migrateFromLocalStorage, runDiagnostics } from './services/supabaseService';
 import { isAdmin, ADMIN_EMAIL } from './services/adminService';
 import { getAppSettings } from './services/settingsService';
+import { initializePWA } from './services/pwaService';
 import { ToastContainer, useToast } from './components/Toast';
 
 // Types for partnership feature
@@ -226,7 +227,7 @@ const App: React.FC = () => {
     };
   }, []);
 
-  // Load app settings and update title/favicon
+  // Load app settings and update title/favicon/PWA
   useEffect(() => {
     const loadSettings = async () => {
       try {
@@ -244,12 +245,16 @@ const App: React.FC = () => {
         if (faviconElement && settings.app_favicon) {
           faviconElement.href = settings.app_favicon;
         } else if (faviconElement && !settings.app_favicon) {
-          // Remove favicon if empty
-          faviconElement.href = '';
+          // Fallback to default favicon
+          faviconElement.href = '/icon-192.png';
         }
         
-        // Update logo in header if needed (can be added later)
-        // For now, we just update title and favicon
+        // Update PWA manifest and icons from settings
+        await initializePWA({
+          app_name: settings.app_name,
+          app_logo: settings.app_logo,
+          app_favicon: settings.app_favicon
+        });
       } catch (error) {
         console.error('Error loading app settings:', error);
       }

@@ -77,10 +77,28 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ adminEmail }) => {
         // Update previews
         setLogoPreview(settings.app_logo || '');
         setFaviconPreview(settings.app_favicon || '');
-        // Reload page to apply changes after a short delay
-        setTimeout(() => {
-          window.location.reload();
-        }, 1500);
+        
+        // Update PWA immediately without reload
+        const { initializePWA } = await import('../services/pwaService');
+        await initializePWA({
+          app_name: settings.app_name,
+          app_logo: settings.app_logo,
+          app_favicon: settings.app_favicon
+        });
+        
+        // Update title and favicon immediately
+        const titleElement = document.getElementById('app-title');
+        if (titleElement) {
+          titleElement.textContent = settings.app_name;
+        }
+        document.title = settings.app_name;
+        
+        const faviconElement = document.getElementById('app-favicon') as HTMLLinkElement;
+        if (faviconElement && settings.app_favicon) {
+          faviconElement.href = settings.app_favicon;
+        }
+        
+        showToast('PWA icons dan manifest sudah diupdate!', 'success');
       } else {
         showToast('Gagal menyimpan pengaturan', 'error');
       }
