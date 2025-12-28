@@ -27,7 +27,7 @@ import { HABITS, MINGGUAN, EMERGENCY } from './constants';
 import { Habit, HabitCategory, DailyProgress, AppState } from './types';
 import Login from './components/Login';
 import { onAuthChange, signOutUser, getCurrentUser } from './services/authService';
-import { getUserData, saveUserData, subscribeToUserData, migrateFromLocalStorage } from './services/supabaseService';
+import { getUserData, saveUserData, subscribeToUserData, migrateFromLocalStorage, runDiagnostics } from './services/supabaseService';
 import { isAdmin, ADMIN_EMAIL } from './services/adminService';
 
 // Types for partnership feature
@@ -139,11 +139,29 @@ const App: React.FC = () => {
         if (currentUser) {
           // Load data from Supabase
           try {
+            // Run diagnostics first to check connection
+            console.log('🔍 Running Supabase diagnostics...');
+            const diagnostics = await runDiagnostics();
+            console.log('📊 Diagnostic Results:', diagnostics);
+            
+            if (!diagnostics.table.ok) {
+              console.error('❌ TABEL TIDAK ADA! Jalankan SQL schema di Supabase.');
+              setSyncError('Tabel database tidak ada');
+            } else if (!diagnostics.save.ok) {
+              console.error('❌ TIDAK BISA MENYIMPAN! Cek RLS policies.');
+              setSyncError('Tidak bisa menyimpan');
+            } else {
+              console.log('✅ Supabase connection OK!');
+            }
+            
             await migrateFromLocalStorage();
             
             const userData = await getUserData();
+            console.log('📥 Loaded user data:', userData ? `${Object.keys(userData.progress || {}).length} days` : 'none');
+            
             if (userData && mounted) {
               setState(userData);
+              setLastSyncTime(new Date());
             }
 
             // Subscribe to real-time data changes
@@ -153,12 +171,15 @@ const App: React.FC = () => {
               unsubscribeStorage = subscribeToUserData((updatedState) => {
                 // Skip if we're saving or have pending changes
                 if (updatedState && mounted && !isSavingRef.current && !pendingStateRef.current) {
+                  console.log('📥 Real-time update received');
                   setState(updatedState);
+                  setLastSyncTime(new Date());
                 }
               });
             }
           } catch (error) {
             console.error('Error loading data:', error);
+            setSyncError('Error loading data');
             // Don't crash the app, just log the error
             // User can still use the app with default state
           }
