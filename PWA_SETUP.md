@@ -31,23 +31,32 @@ Aplikasi ini sudah dikonfigurasi sebagai **Progressive Web App (PWA)** yang bisa
 
 ### Icons (PENTING!)
 
-Anda perlu membuat 2 icon file:
+Anda **HARUS** membuat 2 icon file sebelum deploy:
 
 1. **`public/icon-192.png`** - 192x192 pixels
 2. **`public/icon-512.png`** - 512x512 pixels
 
 **Cara membuat icon:**
-- Gunakan logo aplikasi
-- Format: PNG dengan transparansi
-- Ukuran: 192x192 dan 512x512 pixels
-- Bisa menggunakan tools online: https://realfavicongenerator.net/
 
-### Atau generate placeholder:
+**Opsi 1: Online Generator (MUDAH)**
+1. Buka https://realfavicongenerator.net/
+2. Upload logo/icon aplikasi
+3. Download semua sizes
+4. Copy `android-chrome-192x192.png` → rename ke `icon-192.png`
+5. Copy `android-chrome-512x512.png` → rename ke `icon-512.png`
+6. Taruh di folder `public/`
 
-```bash
-# Install ImageMagick atau gunakan online tool
-# Buat icon sederhana dulu untuk testing
-```
+**Opsi 2: Manual dengan Design Tool**
+- Gunakan Figma, Canva, atau Photoshop
+- Buat icon 512x512 pixels
+- Export sebagai PNG
+- Resize ke 192x192 untuk icon kecil
+- Taruh di `public/`
+
+**Opsi 3: Generate dari Logo**
+- Jika sudah punya logo, resize ke 192x192 dan 512x512
+- Pastikan background transparan atau solid color
+- Format: PNG
 
 ## 🔧 Konfigurasi
 
