@@ -433,20 +433,22 @@ const App: React.FC = () => {
   }, []);
 
   const totalPointsPossible = HABITS.reduce((sum, h) => sum + h.points, 0);
+  const todayCompletedIds = todayProgress?.completedHabitIds || [];
   const currentPoints = HABITS
-    .filter(h => todayProgress.completedHabitIds.includes(h.id))
+    .filter(h => todayCompletedIds.includes(h.id))
     .reduce((sum, h) => sum + h.points, 0);
   
   const completionPercentage = Math.round((currentPoints / totalPointsPossible) * 100);
 
   const statsData = useMemo(() => {
-    const entries = Object.entries(state.progress) as [string, DailyProgress][];
+    const entries = Object.entries(state.progress || {}) as [string, DailyProgress][];
     return entries
       .sort(([a], [b]) => a.localeCompare(b))
       .slice(-7)
       .map(([date, prog]) => {
+        const completedIds = prog?.completedHabitIds || [];
         const points = HABITS
-          .filter(h => prog.completedHabitIds.includes(h.id))
+          .filter(h => completedIds.includes(h.id))
           .reduce((sum, h) => sum + h.points, 0);
         return {
           date: date.split('-').slice(1).join('/'),
@@ -492,9 +494,10 @@ const App: React.FC = () => {
         muhasabah: { jujur: true, followUp: true, hakOrang: true, dosaDigital: false }
       };
       
-      const newCompleted = current.completedHabitIds.includes(id)
-        ? current.completedHabitIds.filter(hid => hid !== id)
-        : [...current.completedHabitIds, id];
+      const currentIds = current.completedHabitIds || [];
+      const newCompleted = currentIds.includes(id)
+        ? currentIds.filter(hid => hid !== id)
+        : [...currentIds, id];
 
       return {
         ...prev,
@@ -773,7 +776,7 @@ const App: React.FC = () => {
                 />
                 <div className="space-y-2.5">
                   {habits.map(habit => {
-                    const isCompleted = todayProgress.completedHabitIds.includes(habit.id);
+                    const isCompleted = todayCompletedIds.includes(habit.id);
                     return (
                     <Card key={habit.id} className={`group transition-all duration-500 ease-out ${
                       isCompleted 
