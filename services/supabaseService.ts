@@ -167,10 +167,17 @@ export const getUserData = async (): Promise<AppState | null> => {
       return null;
     }
 
-    return {
+    // Debug: Log raw data from Supabase
+    console.log('📦 Raw data from Supabase:', JSON.stringify(data, null, 2));
+    console.log('📅 Dates in progress:', Object.keys(data.progress || {}));
+
+    const result = {
       currentDate: data.current_date_value || new Date().toISOString().split('T')[0],
       progress: (data.progress as Record<string, DailyProgress>) || {}
     };
+    
+    console.log('📊 Parsed result:', result);
+    return result;
   } catch (error) {
     console.error('Error getting user data:', error);
     return null;

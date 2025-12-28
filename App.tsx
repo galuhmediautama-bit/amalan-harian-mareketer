@@ -160,6 +160,10 @@ const App: React.FC = () => {
             console.log('📥 Loaded user data:', userData ? `${Object.keys(userData.progress || {}).length} days` : 'none');
             
             if (userData && mounted) {
+              console.log('📅 Today is:', new Date().toISOString().split('T')[0]);
+              console.log('📅 Selected date:', selectedDate);
+              console.log('📦 Progress keys:', Object.keys(userData.progress || {}));
+              console.log('📦 Today progress:', userData.progress[new Date().toISOString().split('T')[0]]);
               setState(userData);
               setLastSyncTime(new Date());
             }
