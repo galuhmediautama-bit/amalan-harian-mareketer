@@ -1,0 +1,43 @@
+{
+  "name": "Amalan Marketer Berkah",
+  "short_name": "Amalan Berkah",
+  "description": "Aplikasi evaluasi amalan harian untuk marketer berkah",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#134e4a",
+  "theme_color": "#134e4a",
+  "orientation": "portrait",
+  "icons": [
+    {
+      "src": "/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ],
+  "categories": ["productivity", "lifestyle"],
+  "screenshots": [],
+  "shortcuts": [
+    {
+      "name": "Evaluasi Harian",
+      "short_name": "Harian",
+      "description": "Buka evaluasi harian",
+      "url": "/?tab=daily",
+      "icons": [{ "src": "/icon-192.png", "sizes": "192x192" }]
+    },
+    {
+      "name": "Grafik",
+      "short_name": "Grafik",
+      "description": "Lihat grafik performa",
+      "url": "/?tab=stats",
+      "icons": [{ "src": "/icon-192.png", "sizes": "192x192" }]
+    }
+  ]
+}
+
