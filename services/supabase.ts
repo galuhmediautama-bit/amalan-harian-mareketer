@@ -3,19 +3,17 @@ import { createClient } from '@supabase/supabase-js';
 // Use environment variables with fallback to hardcoded values for production
 const supabaseUrl = import.meta.env.VITE_SUPABASE_URL || 'https://ojmicttywrqeflqjmqfm.supabase.co';
 
-// IMPORTANT: This should be the "anon" key from Supabase Dashboard > Project Settings > API
-// NOT the "Publishable API Key" - that's different!
-// The anon key usually starts with "eyJ..."
-const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im9qbWljdHR5d3JxZWZscWptcWZtIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzUzOTU2MDAsImV4cCI6MjA1MDk3MTYwMH0.placeholder';
+// Anon key from Supabase Dashboard > Project Settings > API
+const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im9qbWljdHR5d3JxZWZscWptcWZtIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjY4NDU1OTksImV4cCI6MjA4MjQyMTU5OX0.kLAlHqaPub0fixy3cAs8hNj5NAtT9BU44Hs_FUW8Rw4';
 
-// Check if using placeholder key
-const isPlaceholderKey = supabaseAnonKey.includes('placeholder');
+// Check if key is valid format
+const isValidKey = supabaseAnonKey.startsWith('eyJ');
 
 // Validate configuration
-if (!supabaseUrl || !supabaseAnonKey || isPlaceholderKey) {
-  console.warn('⚠️ Supabase anon key may not be configured correctly!');
-  console.warn('Go to: Supabase Dashboard > Project Settings > API > Project API keys > anon (public)');
-  console.warn('The anon key starts with "eyJ..."');
+if (!supabaseUrl || !supabaseAnonKey || !isValidKey) {
+  console.warn('⚠️ Supabase configuration issue!');
+  console.warn('URL:', supabaseUrl);
+  console.warn('Key valid:', isValidKey);
 }
 
 // Create Supabase client with error handling
