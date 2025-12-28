@@ -15,6 +15,8 @@ import {
 } from 'lucide-react';
 import { getAllUsersStats, getAdminStats, UserStats, AdminStats } from '../services/adminService';
 import { getAppSettings, updateAppSettings, fileToBase64, AppSettings } from '../services/settingsService';
+import { showToast } from './Toast';
+import Modal, { showModal } from './Modal';
 
 interface AdminPanelProps {
   adminEmail: string;
@@ -71,18 +73,20 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ adminEmail }) => {
     try {
       const success = await updateAppSettings(settings);
       if (success) {
-        alert('✅ Pengaturan berhasil disimpan!');
+        showToast('Pengaturan berhasil disimpan!', 'success');
         // Update previews
         setLogoPreview(settings.app_logo || '');
         setFaviconPreview(settings.app_favicon || '');
-        // Reload page to apply changes
-        window.location.reload();
+        // Reload page to apply changes after a short delay
+        setTimeout(() => {
+          window.location.reload();
+        }, 1500);
       } else {
-        alert('❌ Gagal menyimpan pengaturan');
+        showToast('Gagal menyimpan pengaturan', 'error');
       }
     } catch (error) {
       console.error('Error saving settings:', error);
-      alert('❌ Error: ' + (error as Error).message);
+      showToast('Error: ' + (error as Error).message, 'error');
     } finally {
       setSavingSettings(false);
     }
@@ -97,7 +101,7 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ adminEmail }) => {
         setLogoPreview(base64);
       } catch (error) {
         console.error('Error converting logo:', error);
-        alert('❌ Gagal mengupload logo');
+        showToast('Gagal mengupload logo', 'error');
       }
     }
   };
@@ -111,7 +115,7 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ adminEmail }) => {
         setFaviconPreview(base64);
       } catch (error) {
         console.error('Error converting favicon:', error);
-        alert('❌ Gagal mengupload favicon');
+        showToast('Gagal mengupload favicon', 'error');
       }
     }
   };

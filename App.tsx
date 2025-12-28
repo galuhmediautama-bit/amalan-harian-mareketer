@@ -30,6 +30,7 @@ import { onAuthChange, signOutUser, getCurrentUser } from './services/authServic
 import { getUserData, saveUserData, subscribeToUserData, migrateFromLocalStorage, runDiagnostics } from './services/supabaseService';
 import { isAdmin, ADMIN_EMAIL } from './services/adminService';
 import { getAppSettings } from './services/settingsService';
+import { ToastContainer, useToast } from './components/Toast';
 
 // Types for partnership feature
 type Partnership = {
@@ -77,6 +78,7 @@ const SectionHeader: React.FC<{ title: string, icon: React.ReactNode }> = ({ tit
 );
 
 const App: React.FC = () => {
+  const { toasts, removeToast } = useToast();
   const [user, setUser] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [state, setState] = useState<AppState>(() => {
@@ -1031,7 +1033,7 @@ const App: React.FC = () => {
                                 setPartnership(updatedPartnership);
                                 setPendingInvitations(updatedInvitations);
                               } catch (error: any) {
-                                alert(error.message || 'Error accepting partnership');
+                                showToast(error.message || 'Error accepting partnership', 'error');
                               }
                             }}
                             className="flex-1 px-3 py-1.5 bg-green-600 text-white text-xs font-black rounded-lg hover:bg-green-700 active:scale-95 transition-all"
@@ -1046,7 +1048,7 @@ const App: React.FC = () => {
                                 const updatedInvitations = await partnershipService.getPendingInvitations();
                                 setPendingInvitations(updatedInvitations);
                               } catch (error: any) {
-                                alert(error.message || 'Error rejecting partnership');
+                                showToast(error.message || 'Error rejecting partnership', 'error');
                               }
                             }}
                             className="flex-1 px-3 py-1.5 bg-red-600 text-white text-xs font-black rounded-lg hover:bg-red-700 active:scale-95 transition-all"
@@ -1135,7 +1137,7 @@ const App: React.FC = () => {
                           const updatedInvitations = await partnershipService.getPendingInvitations();
                           setPendingInvitations(updatedInvitations);
                         } catch (error: any) {
-                          alert(error.message || 'Error inviting partner');
+                          showToast(error.message || 'Error inviting partner', 'error');
                         }
                       }}
                       className="flex-1 px-4 py-2 bg-purple-600 text-white text-sm font-black rounded-lg hover:bg-purple-700 active:scale-95 transition-all"
@@ -1317,7 +1319,7 @@ const App: React.FC = () => {
                               const updatedMessages = await messageService.getMessages(partnerId);
                               setMessages(updatedMessages);
                             } catch (error: any) {
-                              alert(error.message || 'Error sending message');
+                              showToast(error.message || 'Error sending message', 'error');
                             }
                           }
                         }}
@@ -1606,6 +1608,9 @@ const App: React.FC = () => {
           </div>
         </div>
       )}
+
+      {/* Toast Container */}
+      <ToastContainer toasts={toasts} onClose={removeToast} />
     </div>
   );
 };
