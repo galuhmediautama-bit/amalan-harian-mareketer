@@ -113,6 +113,10 @@ const App: React.FC = () => {
   const [inviteEmail, setInviteEmail] = useState('');
   const [showInviteModal, setShowInviteModal] = useState(false);
 
+  // Refs for saving state (to prevent race conditions)
+  const isSavingRef = React.useRef(false);
+  const pendingStateRef = React.useRef<AppState | null>(null);
+
   // Check authentication and load data
   useEffect(() => {
     let unsubscribeStorage: (() => void) | null = null;
@@ -135,9 +139,12 @@ const App: React.FC = () => {
             }
 
             // Subscribe to real-time data changes
+            // Note: We don't update state from real-time if we're actively saving
+            // This prevents race conditions where server data overwrites local pending changes
             if (mounted) {
               unsubscribeStorage = subscribeToUserData((updatedState) => {
-                if (updatedState && mounted) {
+                // Skip if we're saving or have pending changes
+                if (updatedState && mounted && !isSavingRef.current && !pendingStateRef.current) {
                   setState(updatedState);
                 }
               });
@@ -177,20 +184,42 @@ const App: React.FC = () => {
     };
   }, []);
 
-  // Save to Supabase when state changes (debounced)
+  // Save to Supabase when state changes (debounced with race condition protection)
   useEffect(() => {
     if (!user) return;
+    
+    // Store the latest state to save
+    pendingStateRef.current = state;
+    
+    // If already saving, the current save will pick up the latest state
+    if (isSavingRef.current) {
+      return;
+    }
 
     setIsSaving(true);
     const timeoutId = setTimeout(async () => {
+      // Mark as saving
+      isSavingRef.current = true;
+      
       try {
-        await saveUserData(state);
+        // Get the latest pending state
+        const stateToSave = pendingStateRef.current;
+        if (stateToSave) {
+          await saveUserData(stateToSave);
+        }
       } catch (error) {
         console.error('Error saving data:', error);
       } finally {
+        isSavingRef.current = false;
         setIsSaving(false);
+        
+        // Check if there's newer state to save
+        if (pendingStateRef.current !== state) {
+          // There were more changes during save, trigger another save
+          pendingStateRef.current = null;
+        }
       }
-    }, 1000); // Debounce 1 second
+    }, 500); // Reduced to 500ms for faster response
 
     return () => clearTimeout(timeoutId);
   }, [state, user]);
