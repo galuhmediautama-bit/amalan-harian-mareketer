@@ -612,49 +612,56 @@ const App: React.FC = () => {
         </div>
       </header>
 
-      {/* Navigation Tabs */}
+      {/* Navigation Tabs - Same style as bottom navbar */}
       <div className="px-4 -mt-4 relative z-20">
-        <div className="bg-white rounded-xl shadow-xl border-2 border-slate-200 p-1.5 flex gap-1.5 relative overflow-hidden">
-          {/* Animated background indicator with gradient */}
-          <div 
-            className={`absolute top-1.5 bottom-1.5 rounded-lg bg-gradient-to-r from-teal-700 to-teal-600 transition-all duration-500 ease-out shadow-lg shadow-teal-500/30 ${
-              activeTab === 'daily' ? 'left-1.5 w-[calc(33.333%-0.75rem)]' :
-              activeTab === 'stats' ? 'left-[calc(33.333%+0.25rem)] w-[calc(33.333%-0.75rem)]' :
-              'left-[calc(66.666%+0.25rem)] w-[calc(33.333%-0.75rem)]'
-            }`}
-          />
+        <div className="bg-white/95 backdrop-blur-xl rounded-2xl shadow-[0_8px_30px_rgba(0,0,0,0.12)] border-2 border-slate-200/80 p-2 flex gap-1">
           <button 
             onClick={() => setActiveTab('daily')}
-            className={`flex-1 py-2.5 px-2 rounded-lg text-[11px] font-black transition-all duration-300 flex items-center justify-center gap-1.5 min-h-[38px] relative z-10 ${
-              activeTab === 'daily' 
-                ? 'text-white transform scale-[1.02]' 
-                : 'text-slate-700 hover:text-teal-700 active:scale-95'
+            className={`flex flex-col items-center gap-1 transition-all active:scale-90 flex-1 justify-center relative py-2 rounded-xl ${
+              activeTab === 'daily' ? 'text-teal-950 scale-105 bg-teal-50' : 'text-slate-500 hover:bg-slate-50'
             }`}
           >
-            <CheckCircle className={`w-3.5 h-3.5 transition-all ${activeTab === 'daily' ? 'scale-110 drop-shadow-lg' : ''}`} /> 
-            <span>HARIAN</span>
+            {activeTab === 'daily' && (
+              <div className="absolute top-0.5 left-1/2 transform -translate-x-1/2 w-6 h-1 bg-teal-600 rounded-full"></div>
+            )}
+            <CheckCircle className={`w-5 h-5 transition-all ${activeTab === 'daily' ? 'fill-teal-100 text-teal-900 stroke-[3px] drop-shadow-md' : 'text-slate-400 stroke-[2.5px]'}`} />
+            <span className={`text-[9px] font-black uppercase tracking-wider transition-colors ${activeTab === 'daily' ? 'text-teal-950' : 'text-slate-500'}`}>Harian</span>
           </button>
           <button 
             onClick={() => setActiveTab('stats')}
-            className={`flex-1 py-2.5 px-2 rounded-lg text-[11px] font-black transition-all duration-300 flex items-center justify-center gap-1.5 min-h-[38px] relative z-10 ${
-              activeTab === 'stats' 
-                ? 'text-white transform scale-[1.02]' 
-                : 'text-slate-700 hover:text-teal-700 active:scale-95'
+            className={`flex flex-col items-center gap-1 transition-all active:scale-90 flex-1 justify-center relative py-2 rounded-xl ${
+              activeTab === 'stats' ? 'text-teal-950 scale-105 bg-teal-50' : 'text-slate-500 hover:bg-slate-50'
             }`}
           >
-            <TrendingUp className={`w-3.5 h-3.5 transition-all ${activeTab === 'stats' ? 'scale-110 drop-shadow-lg' : ''}`} /> 
-            <span>GRAFIK</span>
+            {activeTab === 'stats' && (
+              <div className="absolute top-0.5 left-1/2 transform -translate-x-1/2 w-6 h-1 bg-teal-600 rounded-full"></div>
+            )}
+            <TrendingUp className={`w-5 h-5 transition-all ${activeTab === 'stats' ? 'text-teal-900 stroke-[3px] drop-shadow-md' : 'text-slate-400 stroke-[2.5px]'}`} />
+            <span className={`text-[9px] font-black uppercase tracking-wider transition-colors ${activeTab === 'stats' ? 'text-teal-950' : 'text-slate-500'}`}>Grafik</span>
+          </button>
+          <button 
+            onClick={() => setActiveTab('together')}
+            className={`flex flex-col items-center gap-1 transition-all active:scale-90 flex-1 justify-center relative py-2 rounded-xl ${
+              activeTab === 'together' ? 'text-purple-950 scale-105 bg-purple-50' : 'text-slate-500 hover:bg-slate-50'
+            }`}
+          >
+            {activeTab === 'together' && (
+              <div className="absolute top-0.5 left-1/2 transform -translate-x-1/2 w-6 h-1 bg-purple-600 rounded-full"></div>
+            )}
+            <Users className={`w-5 h-5 transition-all ${activeTab === 'together' ? 'text-purple-900 stroke-[3px] drop-shadow-md' : 'text-slate-400 stroke-[2.5px]'}`} />
+            <span className={`text-[9px] font-black uppercase tracking-wider transition-colors ${activeTab === 'together' ? 'text-purple-950' : 'text-slate-500'}`}>Bersama</span>
           </button>
           <button 
             onClick={() => setActiveTab('emergency')}
-            className={`flex-1 py-2.5 px-2 rounded-lg text-[11px] font-black transition-all duration-300 flex items-center justify-center gap-1.5 min-h-[38px] relative z-10 ${
-              activeTab === 'emergency' 
-                ? 'text-white transform scale-[1.02] bg-gradient-to-r from-red-600 to-red-500 rounded-lg' 
-                : 'text-slate-700 hover:text-red-600 active:scale-95'
+            className={`flex flex-col items-center gap-1 transition-all active:scale-90 flex-1 justify-center relative py-2 rounded-xl ${
+              activeTab === 'emergency' ? 'text-red-900 scale-105 bg-red-50' : 'text-slate-500 hover:bg-slate-50'
             }`}
           >
-            <AlertTriangle className={`w-3.5 h-3.5 transition-all ${activeTab === 'emergency' ? 'scale-110 drop-shadow-lg' : ''}`} /> 
-            <span>BONCOS</span>
+            {activeTab === 'emergency' && (
+              <div className="absolute top-0.5 left-1/2 transform -translate-x-1/2 w-6 h-1 bg-red-600 rounded-full"></div>
+            )}
+            <AlertTriangle className={`w-5 h-5 transition-all ${activeTab === 'emergency' ? 'fill-red-50 text-red-900 stroke-[3px] drop-shadow-md' : 'text-slate-400 stroke-[2.5px]'}`} />
+            <span className={`text-[9px] font-black uppercase tracking-wider transition-colors ${activeTab === 'emergency' ? 'text-red-950' : 'text-slate-500'}`}>Boncos</span>
           </button>
         </div>
       </div>
