@@ -29,6 +29,7 @@ import Login from './components/Login';
 import { onAuthChange, signOutUser, getCurrentUser } from './services/authService';
 import { getUserData, saveUserData, subscribeToUserData, migrateFromLocalStorage, runDiagnostics } from './services/supabaseService';
 import { isAdmin, ADMIN_EMAIL } from './services/adminService';
+import { getAppSettings } from './services/settingsService';
 
 // Types for partnership feature
 type Partnership = {
@@ -221,6 +222,38 @@ const App: React.FC = () => {
         unsubscribeStorage();
       }
     };
+  }, []);
+
+  // Load app settings and update title/favicon
+  useEffect(() => {
+    const loadSettings = async () => {
+      try {
+        const settings = await getAppSettings();
+        
+        // Update title
+        const titleElement = document.getElementById('app-title');
+        if (titleElement) {
+          titleElement.textContent = settings.app_name;
+        }
+        document.title = settings.app_name;
+        
+        // Update favicon
+        const faviconElement = document.getElementById('app-favicon') as HTMLLinkElement;
+        if (faviconElement && settings.app_favicon) {
+          faviconElement.href = settings.app_favicon;
+        } else if (faviconElement && !settings.app_favicon) {
+          // Remove favicon if empty
+          faviconElement.href = '';
+        }
+        
+        // Update logo in header if needed (can be added later)
+        // For now, we just update title and favicon
+      } catch (error) {
+        console.error('Error loading app settings:', error);
+      }
+    };
+    
+    loadSettings();
   }, []);
 
   // Save to Supabase when state changes (debounced with race condition protection)

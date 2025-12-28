@@ -292,6 +292,74 @@ ALTER PUBLICATION supabase_realtime ADD TABLE partnerships;
 ALTER PUBLICATION supabase_realtime ADD TABLE messages;
 
 -- ============================================
+-- 5. TABLE: app_settings
+-- Menyimpan pengaturan aplikasi (nama web, logo, favicon)
+-- ============================================
+
+CREATE TABLE IF NOT EXISTS app_settings (
+  id BIGSERIAL PRIMARY KEY,
+  setting_key TEXT NOT NULL UNIQUE,
+  setting_value TEXT NOT NULL,
+  updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  updated_by UUID REFERENCES auth.users(id),
+  created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
+-- Index untuk performa query
+CREATE INDEX IF NOT EXISTS idx_app_settings_key ON app_settings(setting_key);
+
+-- Enable Row Level Security (RLS)
+ALTER TABLE app_settings ENABLE ROW LEVEL SECURITY;
+
+-- Drop existing policies first
+DROP POLICY IF EXISTS "Anyone can view settings" ON app_settings;
+DROP POLICY IF EXISTS "Only admin can update settings" ON app_settings;
+DROP POLICY IF EXISTS "Only admin can insert settings" ON app_settings;
+
+-- Policies untuk app_settings
+-- Semua user bisa lihat settings (untuk tampilan web)
+CREATE POLICY "Anyone can view settings"
+  ON app_settings FOR SELECT
+  USING (true);
+
+-- Hanya admin yang bisa update settings
+CREATE POLICY "Only admin can update settings"
+  ON app_settings FOR UPDATE
+  USING (
+    EXISTS (
+      SELECT 1 FROM auth.users
+      WHERE auth.users.id = auth.uid()
+      AND auth.users.email = 'galuhmediautama@gmail.com'
+    )
+  )
+  WITH CHECK (
+    EXISTS (
+      SELECT 1 FROM auth.users
+      WHERE auth.users.id = auth.uid()
+      AND auth.users.email = 'galuhmediautama@gmail.com'
+    )
+  );
+
+-- Policy untuk insert (hanya admin)
+CREATE POLICY "Only admin can insert settings"
+  ON app_settings FOR INSERT
+  WITH CHECK (
+    EXISTS (
+      SELECT 1 FROM auth.users
+      WHERE auth.users.id = auth.uid()
+      AND auth.users.email = 'galuhmediautama@gmail.com'
+    )
+  );
+
+-- Insert default settings
+INSERT INTO app_settings (setting_key, setting_value) 
+VALUES 
+  ('app_name', 'Amalan Marketer Berkah'),
+  ('app_logo', ''),
+  ('app_favicon', '')
+ON CONFLICT (setting_key) DO NOTHING;
+
+-- ============================================
 -- PANDUAN PENGGUNAAN
 -- ============================================
 -- 
@@ -308,5 +376,6 @@ ALTER PUBLICATION supabase_realtime ADD TABLE messages;
 -- DROP TABLE IF EXISTS messages CASCADE;
 -- DROP TABLE IF EXISTS partnerships CASCADE;
 -- DROP TABLE IF EXISTS user_progress CASCADE;
+-- DROP TABLE IF EXISTS app_settings CASCADE;
 -- Lalu jalankan script ini lagi
 -- ============================================

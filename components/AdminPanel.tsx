@@ -7,9 +7,14 @@ import {
   Activity,
   RefreshCw,
   Shield,
-  BarChart3
+  BarChart3,
+  Settings,
+  Save,
+  Image as ImageIcon,
+  Globe
 } from 'lucide-react';
 import { getAllUsersStats, getAdminStats, UserStats, AdminStats } from '../services/adminService';
+import { getAppSettings, updateAppSettings, fileToBase64, AppSettings } from '../services/settingsService';
 
 interface AdminPanelProps {
   adminEmail: string;
@@ -20,15 +25,30 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ adminEmail }) => {
   const [users, setUsers] = useState<UserStats[]>([]);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
+  const [activeSection, setActiveSection] = useState<'stats' | 'settings'>('stats');
+  
+  // Settings state
+  const [settings, setSettings] = useState<AppSettings>({
+    app_name: 'Amalan Marketer Berkah',
+    app_logo: '',
+    app_favicon: ''
+  });
+  const [savingSettings, setSavingSettings] = useState(false);
+  const [logoPreview, setLogoPreview] = useState<string>('');
+  const [faviconPreview, setFaviconPreview] = useState<string>('');
 
   const loadData = async () => {
     try {
-      const [adminStats, usersStats] = await Promise.all([
+      const [adminStats, usersStats, appSettings] = await Promise.all([
         getAdminStats(),
-        getAllUsersStats()
+        getAllUsersStats(),
+        getAppSettings()
       ]);
       setStats(adminStats);
       setUsers(usersStats);
+      setSettings(appSettings);
+      setLogoPreview(appSettings.app_logo || '');
+      setFaviconPreview(appSettings.app_favicon || '');
     } catch (error) {
       console.error('Error loading admin data:', error);
     } finally {
@@ -44,6 +64,56 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ adminEmail }) => {
   const handleRefresh = () => {
     setRefreshing(true);
     loadData();
+  };
+
+  const handleSaveSettings = async () => {
+    setSavingSettings(true);
+    try {
+      const success = await updateAppSettings(settings);
+      if (success) {
+        alert('✅ Pengaturan berhasil disimpan!');
+        // Update previews
+        setLogoPreview(settings.app_logo || '');
+        setFaviconPreview(settings.app_favicon || '');
+        // Reload page to apply changes
+        window.location.reload();
+      } else {
+        alert('❌ Gagal menyimpan pengaturan');
+      }
+    } catch (error) {
+      console.error('Error saving settings:', error);
+      alert('❌ Error: ' + (error as Error).message);
+    } finally {
+      setSavingSettings(false);
+    }
+  };
+
+  const handleLogoUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      try {
+        const base64 = await fileToBase64(file);
+        setSettings({ ...settings, app_logo: base64 });
+        setLogoPreview(base64);
+      } catch (error) {
+        console.error('Error converting logo:', error);
+        alert('❌ Gagal mengupload logo');
+      }
+    }
+  };
+
+  const handleFaviconUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      try {
+        const base64 = await fileToBase64(file);
+        setSettings({ ...settings, app_favicon: base64 });
+        setFaviconPreview(base64);
+      } catch (error) {
+        console.error('Error converting favicon:', error);
+        alert('❌ Gagal mengupload favicon');
+      }
+    }
   };
 
   if (loading) {
@@ -80,11 +150,170 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ adminEmail }) => {
           </button>
         </div>
         
-        <p className="text-purple-100 text-xs font-medium leading-relaxed">
+        <p className="text-purple-100 text-xs font-medium leading-relaxed mb-3">
           🔒 Panel ini hanya terlihat oleh Anda. User lain tidak bisa melihat menu ini.
         </p>
+
+        {/* Section Tabs */}
+        <div className="flex gap-2 mt-3">
+          <button
+            onClick={() => setActiveSection('stats')}
+            className={`flex-1 py-2 px-3 rounded-xl font-bold text-sm transition-all ${
+              activeSection === 'stats'
+                ? 'bg-white text-purple-900'
+                : 'bg-white/20 text-white hover:bg-white/30'
+            }`}
+          >
+            📊 Statistik
+          </button>
+          <button
+            onClick={() => setActiveSection('settings')}
+            className={`flex-1 py-2 px-3 rounded-xl font-bold text-sm transition-all ${
+              activeSection === 'settings'
+                ? 'bg-white text-purple-900'
+                : 'bg-white/20 text-white hover:bg-white/30'
+            }`}
+          >
+            ⚙️ Pengaturan
+          </button>
+        </div>
       </div>
 
+      {/* Settings Section */}
+      {activeSection === 'settings' && (
+        <div className="space-y-4">
+          <div className="bg-white rounded-2xl shadow-lg border-2 border-slate-200 overflow-hidden">
+            <div className="bg-slate-100 px-4 py-3 border-b border-slate-200">
+              <h3 className="font-black text-slate-900 text-sm uppercase tracking-wide flex items-center gap-2">
+                <Settings className="w-4 h-4 text-slate-600" />
+                Pengaturan Aplikasi
+              </h3>
+            </div>
+            
+            <div className="p-4 space-y-4">
+              {/* App Name */}
+              <div>
+                <label className="block text-xs font-black text-slate-700 mb-2 uppercase tracking-wide">
+                  <Globe className="w-3.5 h-3.5 inline mr-1" />
+                  Nama Web
+                </label>
+                <input
+                  type="text"
+                  value={settings.app_name}
+                  onChange={(e) => setSettings({ ...settings, app_name: e.target.value })}
+                  className="w-full px-3 py-2 border-2 border-slate-300 rounded-xl focus:border-purple-500 focus:ring-2 focus:ring-purple-200 outline-none font-semibold text-sm"
+                  placeholder="Nama aplikasi..."
+                />
+              </div>
+
+              {/* Logo */}
+              <div>
+                <label className="block text-xs font-black text-slate-700 mb-2 uppercase tracking-wide">
+                  <ImageIcon className="w-3.5 h-3.5 inline mr-1" />
+                  Logo
+                </label>
+                {logoPreview && (
+                  <div className="mb-2 p-3 bg-slate-50 rounded-xl border-2 border-slate-200">
+                    <img 
+                      src={logoPreview} 
+                      alt="Logo Preview" 
+                      className="max-h-20 max-w-full object-contain"
+                    />
+                  </div>
+                )}
+                <label className="block">
+                  <input
+                    type="file"
+                    accept="image/*"
+                    onChange={handleLogoUpload}
+                    className="hidden"
+                  />
+                  <div className="w-full px-3 py-2 border-2 border-dashed border-slate-300 rounded-xl text-center cursor-pointer hover:border-purple-500 hover:bg-purple-50 transition-colors">
+                    <span className="text-xs font-bold text-slate-600">
+                      {logoPreview ? 'Ganti Logo' : '+ Upload Logo'}
+                    </span>
+                  </div>
+                </label>
+                {logoPreview && (
+                  <button
+                    onClick={() => {
+                      setSettings({ ...settings, app_logo: '' });
+                      setLogoPreview('');
+                    }}
+                    className="mt-2 text-xs text-red-600 font-bold hover:text-red-700"
+                  >
+                    Hapus Logo
+                  </button>
+                )}
+              </div>
+
+              {/* Favicon */}
+              <div>
+                <label className="block text-xs font-black text-slate-700 mb-2 uppercase tracking-wide">
+                  <ImageIcon className="w-3.5 h-3.5 inline mr-1" />
+                  Favicon
+                </label>
+                {faviconPreview && (
+                  <div className="mb-2 p-3 bg-slate-50 rounded-xl border-2 border-slate-200">
+                    <img 
+                      src={faviconPreview} 
+                      alt="Favicon Preview" 
+                      className="h-16 w-16 object-contain"
+                    />
+                  </div>
+                )}
+                <label className="block">
+                  <input
+                    type="file"
+                    accept="image/*"
+                    onChange={handleFaviconUpload}
+                    className="hidden"
+                  />
+                  <div className="w-full px-3 py-2 border-2 border-dashed border-slate-300 rounded-xl text-center cursor-pointer hover:border-purple-500 hover:bg-purple-50 transition-colors">
+                    <span className="text-xs font-bold text-slate-600">
+                      {faviconPreview ? 'Ganti Favicon' : '+ Upload Favicon'}
+                    </span>
+                  </div>
+                </label>
+                {faviconPreview && (
+                  <button
+                    onClick={() => {
+                      setSettings({ ...settings, app_favicon: '' });
+                      setFaviconPreview('');
+                    }}
+                    className="mt-2 text-xs text-red-600 font-bold hover:text-red-700"
+                  >
+                    Hapus Favicon
+                  </button>
+                )}
+              </div>
+
+              {/* Save Button */}
+              <button
+                onClick={handleSaveSettings}
+                disabled={savingSettings}
+                className="w-full py-3 bg-gradient-to-r from-purple-600 to-purple-700 text-white font-black rounded-xl shadow-lg hover:from-purple-700 hover:to-purple-800 transition-all active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+              >
+                {savingSettings ? (
+                  <>
+                    <RefreshCw className="w-4 h-4 animate-spin" />
+                    Menyimpan...
+                  </>
+                ) : (
+                  <>
+                    <Save className="w-4 h-4" />
+                    Simpan Pengaturan
+                  </>
+                )}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Stats Section */}
+      {activeSection === 'stats' && (
+        <>
       {/* Stats Cards */}
       <div className="grid grid-cols-2 gap-3">
         <div className="bg-gradient-to-br from-blue-500 to-blue-600 rounded-2xl p-4 shadow-lg text-white">
@@ -190,6 +419,8 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ adminEmail }) => {
           🛡️ Data terakhir diperbarui: {new Date().toLocaleString('id-ID')}
         </p>
       </div>
+        </>
+      )}
     </div>
   );
 };
