@@ -20,13 +20,15 @@ import {
   UserPlus,
   MessageCircle,
   Trophy,
-  X
+  X,
+  Shield
 } from 'lucide-react';
 import { HABITS, MINGGUAN, EMERGENCY } from './constants';
 import { Habit, HabitCategory, DailyProgress, AppState } from './types';
 import Login from './components/Login';
 import { onAuthChange, signOutUser, getCurrentUser } from './services/authService';
 import { getUserData, saveUserData, subscribeToUserData, migrateFromLocalStorage } from './services/supabaseService';
+import { isAdmin, ADMIN_EMAIL } from './services/adminService';
 
 // Types for partnership feature
 type Partnership = {
@@ -55,6 +57,7 @@ type Message = {
 
 // Lazy load heavy dependencies - only load when needed
 const StatsChart = React.lazy(() => import('./components/StatsChart'));
+const AdminPanel = React.lazy(() => import('./components/AdminPanel'));
 
 // Helper components
 const Card: React.FC<{ children: React.ReactNode, className?: string }> = ({ children, className = "" }) => (
@@ -94,7 +97,10 @@ const App: React.FC = () => {
     };
   });
 
-  const [activeTab, setActiveTab] = useState<'daily' | 'stats' | 'emergency' | 'together'>('daily');
+  const [activeTab, setActiveTab] = useState<'daily' | 'stats' | 'emergency' | 'together' | 'admin'>('daily');
+  
+  // Check if current user is admin
+  const userIsAdmin = useMemo(() => isAdmin(user?.email), [user?.email]);
   const [expandedHabitId, setExpandedHabitId] = useState<string | null>(null);
   const [isSaving, setIsSaving] = useState(false);
   const [currentPrinsipIndex, setCurrentPrinsipIndex] = useState(0);
@@ -663,6 +669,21 @@ const App: React.FC = () => {
             <AlertTriangle className={`w-5 h-5 transition-all ${activeTab === 'emergency' ? 'fill-red-50 text-red-900 stroke-[3px] drop-shadow-md' : 'text-slate-400 stroke-[2.5px]'}`} />
             <span className={`text-[9px] font-black uppercase tracking-wider transition-colors ${activeTab === 'emergency' ? 'text-red-950' : 'text-slate-500'}`}>Boncos</span>
           </button>
+          {/* Admin Tab - Only visible to admin */}
+          {userIsAdmin && (
+            <button 
+              onClick={() => setActiveTab('admin')}
+              className={`flex flex-col items-center gap-1 transition-all active:scale-90 flex-1 justify-center relative py-2 rounded-xl ${
+                activeTab === 'admin' ? 'text-indigo-950 scale-105 bg-indigo-50' : 'text-slate-500 hover:bg-slate-50'
+              }`}
+            >
+              {activeTab === 'admin' && (
+                <div className="absolute top-0.5 left-1/2 transform -translate-x-1/2 w-6 h-1 bg-indigo-600 rounded-full"></div>
+              )}
+              <Shield className={`w-5 h-5 transition-all ${activeTab === 'admin' ? 'text-indigo-900 stroke-[3px] drop-shadow-md' : 'text-slate-400 stroke-[2.5px]'}`} />
+              <span className={`text-[9px] font-black uppercase tracking-wider transition-colors ${activeTab === 'admin' ? 'text-indigo-950' : 'text-slate-500'}`}>Admin</span>
+            </button>
+          )}
         </div>
       </div>
 
@@ -1332,6 +1353,20 @@ const App: React.FC = () => {
             </Card>
           </div>
         )}
+
+        {/* Admin Panel - Only visible to admin */}
+        {activeTab === 'admin' && userIsAdmin && (
+          <Suspense fallback={
+            <div className="flex items-center justify-center h-64">
+              <div className="text-center">
+                <div className="inline-block animate-spin rounded-full h-8 w-8 border-4 border-indigo-600 border-t-transparent mb-2"></div>
+                <p className="text-slate-600 font-semibold text-sm">Loading Admin Panel...</p>
+              </div>
+            </div>
+          }>
+            <AdminPanel adminEmail={user?.email || ''} />
+          </Suspense>
+        )}
       </main>
 
       {/* Bottom Nav - Full Width Fixed */}
@@ -1376,6 +1411,19 @@ const App: React.FC = () => {
           <AlertTriangle className={`w-5 h-5 transition-all ${activeTab === 'emergency' ? 'fill-red-50 text-red-900 stroke-[3px] drop-shadow-md' : 'text-slate-400 stroke-[2.5px]'}`} />
           <span className={`text-[9px] font-black uppercase tracking-wider transition-colors ${activeTab === 'emergency' ? 'text-red-950' : 'text-slate-500'}`}>Boncos</span>
         </button>
+        {/* Admin Button - Only visible to admin */}
+        {userIsAdmin && (
+          <button 
+            onClick={() => setActiveTab('admin')}
+            className={`flex flex-col items-center gap-1 transition-all active:scale-90 flex-1 justify-center relative ${activeTab === 'admin' ? 'text-indigo-950 scale-105' : 'text-slate-500'}`}
+          >
+            {activeTab === 'admin' && (
+              <div className="absolute -top-1 left-1/2 transform -translate-x-1/2 w-8 h-1 bg-indigo-600 rounded-full"></div>
+            )}
+            <Shield className={`w-5 h-5 transition-all ${activeTab === 'admin' ? 'text-indigo-900 stroke-[3px] drop-shadow-md' : 'text-slate-400 stroke-[2.5px]'}`} />
+            <span className={`text-[9px] font-black uppercase tracking-wider transition-colors ${activeTab === 'admin' ? 'text-indigo-950' : 'text-slate-500'}`}>Admin</span>
+          </button>
+        )}
       </nav>
 
       {/* Date Picker Modal */}
