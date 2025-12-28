@@ -103,6 +103,8 @@ const App: React.FC = () => {
   const userIsAdmin = useMemo(() => isAdmin(user?.email), [user?.email]);
   const [expandedHabitId, setExpandedHabitId] = useState<string | null>(null);
   const [isSaving, setIsSaving] = useState(false);
+  const [lastSyncTime, setLastSyncTime] = useState<Date | null>(null);
+  const [syncError, setSyncError] = useState<string | null>(null);
   const [currentPrinsipIndex, setCurrentPrinsipIndex] = useState(0);
   
   // Date selection state
@@ -203,6 +205,8 @@ const App: React.FC = () => {
     }
 
     setIsSaving(true);
+    setSyncError(null);
+    
     const timeoutId = setTimeout(async () => {
       // Mark as saving
       isSavingRef.current = true;
@@ -211,10 +215,15 @@ const App: React.FC = () => {
         // Get the latest pending state
         const stateToSave = pendingStateRef.current;
         if (stateToSave) {
-          await saveUserData(stateToSave);
+          const success = await saveUserData(stateToSave);
+          if (success) {
+            setLastSyncTime(new Date());
+            setSyncError(null);
+          }
         }
-      } catch (error) {
+      } catch (error: any) {
         console.error('Error saving data:', error);
+        setSyncError(error?.message || 'Gagal menyimpan');
       } finally {
         isSavingRef.current = false;
         setIsSaving(false);
@@ -531,12 +540,25 @@ const App: React.FC = () => {
               >
                 <Calendar className="w-4 h-4 text-white" />
               </button>
-              {isSaving && (
-                <div className="text-[10px] text-teal-200 font-black animate-pulse flex items-center gap-1">
-                  <div className="w-1.5 h-1.5 bg-teal-300 rounded-full animate-pulse"></div>
-                  Saving...
-                </div>
-              )}
+              {/* Sync Status Indicator */}
+              <div className="text-[10px] font-black flex items-center gap-1">
+                {isSaving ? (
+                  <div className="text-teal-200 animate-pulse flex items-center gap-1">
+                    <div className="w-1.5 h-1.5 bg-teal-300 rounded-full animate-pulse"></div>
+                    Menyimpan...
+                  </div>
+                ) : syncError ? (
+                  <div className="text-red-300 flex items-center gap-1" title={syncError}>
+                    <div className="w-1.5 h-1.5 bg-red-400 rounded-full"></div>
+                    Gagal sync
+                  </div>
+                ) : lastSyncTime ? (
+                  <div className="text-green-300 flex items-center gap-1">
+                    <div className="w-1.5 h-1.5 bg-green-400 rounded-full"></div>
+                    Tersinkron ☁️
+                  </div>
+                ) : null}
+              </div>
             </div>
           </div>
 
