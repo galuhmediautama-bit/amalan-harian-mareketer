@@ -124,6 +124,7 @@ const App: React.FC = () => {
   // Refs for saving state (to prevent race conditions)
   const isSavingRef = React.useRef(false);
   const pendingStateRef = React.useRef<AppState | null>(null);
+  const initialLoadDoneRef = React.useRef(false); // Track if initial data has been loaded
 
   // Check authentication and load data
   useEffect(() => {
@@ -167,6 +168,10 @@ const App: React.FC = () => {
               setState(userData);
               setLastSyncTime(new Date());
             }
+            
+            // Mark initial load as complete - now saving is allowed
+            initialLoadDoneRef.current = true;
+            console.log('✅ Initial load complete - saving enabled');
 
             // Subscribe to real-time data changes
             // Note: We don't update state from real-time if we're actively saving
@@ -189,6 +194,7 @@ const App: React.FC = () => {
           }
         } else {
           // Clear state when user logs out
+          initialLoadDoneRef.current = false; // Reset so next login waits for load
           setState({
             currentDate: new Date().toISOString().split('T')[0],
             progress: {}
@@ -220,6 +226,13 @@ const App: React.FC = () => {
   // Save to Supabase when state changes (debounced with race condition protection)
   useEffect(() => {
     if (!user) return;
+    
+    // DON'T save until initial data has been loaded from Supabase
+    // This prevents overwriting existing data with empty state on login
+    if (!initialLoadDoneRef.current) {
+      console.log('⏳ Skipping save - initial load not complete yet');
+      return;
+    }
     
     // Store the latest state to save
     pendingStateRef.current = state;
